@@ -21,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,9 +50,9 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @ManyToAny(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles_tbl", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User(String firstname, String lastname, String email, String avatar, int age, Gender gender,
             String password) {
@@ -62,7 +63,6 @@ public class User implements UserDetails {
         this.age = age;
         this.gender = gender;
         this.password = password;
-        this.roles = new HashSet<>();
     }
 
     @Override

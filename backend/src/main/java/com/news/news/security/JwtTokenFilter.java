@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.news.news.model.User;
 import com.news.news.service.impl.JWTService;
 import com.news.news.service.impl.UserService;
 
@@ -41,7 +42,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         try {
             String token = getJwt(request);
 
-            if (token != null && jwtService.isTokenExpired(token)) {
+            if (token != null && !jwtService.isTokenExpired(token)) {
                 String email = jwtService.extractEmail(token);
                 if (StringUtils.isNotEmpty(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userService.userDetailsService().loadUserByUsername(email);

@@ -1,9 +1,9 @@
 package com.news.news.model;
 
 public enum RoleEnum {
-    MOD("MOD"),
-    MEMBER("MEMBER"),
-    ADMIN("ADMIN");
+    MOD("ROLE_MOD"),
+    MEMBER("ROLE_MEMBER"),
+    ADMIN("ROLE_ADMIN");
 
     private String name;
 

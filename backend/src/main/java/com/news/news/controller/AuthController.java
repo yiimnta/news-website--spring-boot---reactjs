@@ -1,13 +1,20 @@
 package com.news.news.controller;
 
+import org.apache.catalina.authenticator.SpnegoAuthenticator.AuthenticateAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.news.news.dto.request.LoginDTO;
 import com.news.news.dto.request.UserDTO;
 import com.news.news.dto.response.JwtAuthenticationResponse;
 import com.news.news.dto.response.ResponseMessage;
@@ -33,6 +40,9 @@ public class AuthController extends Controller {
     @Autowired
     private JWTService jwtService;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @PostMapping("/register")
     public ResponseEntity<?> signup(@RequestBody @Valid UserDTO userDTO) throws Exception {
         if (userService.existsByEmail(userDTO.getEmail())) {
@@ -54,4 +64,17 @@ public class AuthController extends Controller {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO userDTO) throws Exception {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userDTO.getEmail(), userDTO.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+
+        String jwt = jwtService.generateToken(user);
+        return ResponseEntity.ok(JwtAuthenticationResponse.builder().token(jwt).build());
+    }
 }

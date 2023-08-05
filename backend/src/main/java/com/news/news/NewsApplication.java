@@ -15,27 +15,27 @@ import jakarta.annotation.PostConstruct;
 @SpringBootApplication
 public class NewsApplication {
 
-	@Autowired
-	private RoleService roleService;
+    @Autowired
+    private RoleService roleService;
 
-	public static void main(String[] args) {
-		SpringApplication.run(NewsApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NewsApplication.class, args);
+    }
 
-	@PostConstruct
-	public void init() {
+    @PostConstruct
+    public void init() {
 
-		List<Role> roles = (List<Role>) roleService.findAll();
+        List<Role> roles = (List<Role>) roleService.findAll();
 
-		if (roles.isEmpty()) {
-			Role adminRole = new Role(RoleEnum.ADMIN.getName());
-			roleService.save(adminRole);
+        if (roles.isEmpty()) {
+            Role adminRole = new Role(RoleEnum.ADMIN.getName());
+            roleService.save(adminRole);
 
-			Role modRole = new Role(RoleEnum.MOD.getName());
-			roleService.save(modRole);
+            Role modRole = new Role(RoleEnum.MOD.getName());
+            roleService.save(modRole);
 
-			Role memberRole = new Role(RoleEnum.MEMBER.getName());
-			roleService.save(memberRole);
-		}
-	}
+            Role memberRole = new Role(RoleEnum.MEMBER.getName());
+            roleService.save(memberRole);
+        }
+    }
 }
