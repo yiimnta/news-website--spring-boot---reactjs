@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import io.micrometer.common.util.StringUtils;
 
 import com.news.news.dto.request.UserDTO;
 import com.news.news.model.User;
@@ -26,9 +29,16 @@ public class UserService implements IUserService, CRUDService<User> {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${user.default.avatar.link}")
+    private String defaultAvatarLink;
+
     public User saveUserRequest(UserDTO userRequest) {
 
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
+
+        if (StringUtils.isEmpty(userRequest.getAvatar())) {
+            userRequest.setAvatar(defaultAvatarLink);
+        }
 
         User newUser = new User(userRequest.getFirstname(), userRequest.getLastname(), userRequest.getEmail(),
                 userRequest.getAvatar(), userRequest.getAge(), userRequest.getGender(), hashedPassword);

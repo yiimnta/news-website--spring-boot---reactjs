@@ -1,6 +1,5 @@
 package com.news.news.controller;
 
-import org.apache.catalina.authenticator.SpnegoAuthenticator.AuthenticateAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +50,7 @@ public class AuthController extends Controller {
 
             User newUser = userService.saveUserRequest(userDTO);
             Role memberRole = roleService.findByName(RoleEnum.MEMBER).orElse(null);
+
             if (memberRole == null) {
                 throw new Exception("Can not find Member role!");
             } else {
@@ -65,16 +65,17 @@ public class AuthController extends Controller {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO userDTO) throws Exception {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO loginDTO) throws Exception {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDTO.getEmail(), userDTO.getPassword()));
-
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetails user = (UserDetails) authentication.getPrincipal();
 
         String jwt = jwtService.generateToken(user);
+
         return ResponseEntity.ok(JwtAuthenticationResponse.builder().token(jwt).build());
     }
+
 }

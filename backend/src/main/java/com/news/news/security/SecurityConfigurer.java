@@ -52,8 +52,9 @@ public class SecurityConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/public/**", "/auth/**").permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(
+                        request -> request.requestMatchers("/public/**", "/auth/**", "/login").permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
