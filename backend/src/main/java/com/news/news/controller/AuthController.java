@@ -59,8 +59,9 @@ public class AuthController extends Controller {
             }
 
             String jwt = jwtService.generateToken(newUser);
-
-            return ResponseEntity.ok(JwtAuthenticationResponse.builder().token(jwt).build());
+            JwtAuthenticationResponse response = new JwtAuthenticationResponse(newUser);
+            response.setAccessToken(jwt);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -75,7 +76,9 @@ public class AuthController extends Controller {
 
         String jwt = jwtService.generateToken(user);
 
-        return ResponseEntity.ok(JwtAuthenticationResponse.builder().token(jwt).build());
+        JwtAuthenticationResponse response = new JwtAuthenticationResponse(user);
+        response.setAccessToken(jwt);
+        return ResponseEntity.ok(response);
     }
 
 }

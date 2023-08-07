@@ -2,10 +2,12 @@ import { Button, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import "./Login.css";
 import AuthService from "../../services/UserService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AxiosError } from "axios";
 import axios from "axios";
+import { User } from "../../contexts/AuthProvider";
+import useAuth from "../../hooks/useAuth";
 
 type FormValues = {
   email: string;
@@ -20,8 +22,11 @@ type LoginError = {
 export default function Login() {
   const navigate = useNavigate();
   const [loginErrors, setLoginErrors] = useState<LoginError[]>([]);
+  const location = useLocation();
+  const fromLocation = location.state?.from?.pathname || "/";
+  const { setAuth } = useAuth();
 
-  const { register, handleSubmit, formState } = useForm<FormValues>({
+  const { register, handleSubmit, formState, reset } = useForm<FormValues>({
     defaultValues: {
       email: "",
       password: "",
@@ -31,12 +36,14 @@ export default function Login() {
 
   const { errors } = formState;
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (formData: FormValues) => {
     setLoginErrors(() => []);
     try {
-      const res = await AuthService.login(data.email, data.password);
-      localStorage.setItem("logged_user", res.data.token);
-      navigate("/");
+      const res = await AuthService.login(formData.email, formData.password);
+      const data: User = res.data;
+      setAuth(data);
+      reset();
+      navigate(fromLocation, { replace: true });
     } catch (ex) {
       const errs = ex as Error | AxiosError;
 

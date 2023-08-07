@@ -6,7 +6,13 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./components/public/HomePage";
 import NotFound from "./NotFound";
 import UserManager from "./components/admin/UserManager";
-import PrivateRoute from "./components/PrivateRoute";
+import RequireAuth from "./components/RequireAuth";
+
+const ROLES = {
+  MOD: "ROLE_MOD",
+  MEMBER: "ROLE_MEMBER",
+  ADMIN: "ROLE_ADMIN",
+};
 
 function App() {
   return (
@@ -14,15 +20,10 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<HomePage />} />
-        <Route
-          path="/admin/users"
-          element={
-            <PrivateRoute>
-              <UserManager />
-            </PrivateRoute>
-          }
-        />
         <Route path="*" element={<NotFound />} />
+        <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
+          <Route path="/admin/users" element={<UserManager />} />
+        </Route>
       </Routes>
       <ToastContainer
         position="top-right"
