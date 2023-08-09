@@ -28,6 +28,7 @@ public class JwtAuthenticationResponse {
     private String firstname;
     private String lastname;
     private String email;
+    private String avatar;
     private List<String> roles;
     private String accessToken;
 }

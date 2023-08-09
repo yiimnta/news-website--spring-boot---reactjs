@@ -10,7 +10,7 @@ export type User = {
 
 export type IAuthContext = {
   auth: User;
-  setAuth: (value: User) => void;
+  setAuth: React.Dispatch<React.SetStateAction<User>>;
 };
 
 export const AuthContext = createContext<IAuthContext>({

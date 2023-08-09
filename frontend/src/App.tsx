@@ -5,8 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./components/public/HomePage";
 import NotFound from "./NotFound";
-import UserManager from "./components/admin/UserManager";
+import UserManager from "./components/admin/users/UserManager";
 import RequireAuth from "./components/RequireAuth";
+import { DashboardPage } from "./components/admin/dashboard/DashboardPage";
 
 const ROLES = {
   MOD: "ROLE_MOD",
@@ -21,8 +22,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<HomePage />} />
         <Route path="*" element={<NotFound />} />
+        <Route element={<DashboardPage />}>
+          <Route path="/admin/users2" element={<UserManager />} />
+        </Route>
         <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
-          <Route path="/admin/users" element={<UserManager />} />
+          <Route element={<DashboardPage />}>
+            <Route path="/admin/users" element={<UserManager />} />
+          </Route>
         </Route>
       </Routes>
       <ToastContainer
