@@ -89,7 +89,7 @@ public class UserService implements IUserService, CRUDService<User> {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(long id) {
         return userRepository.findById(id);
     }
 
@@ -99,7 +99,7 @@ public class UserService implements IUserService, CRUDService<User> {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         userRepository.deleteById(id);
     }
 }

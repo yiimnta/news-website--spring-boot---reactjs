@@ -7,7 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +17,18 @@ import com.news.news.dto.request.LoginDTO;
 import com.news.news.dto.request.UserDTO;
 import com.news.news.dto.response.JwtAuthenticationResponse;
 import com.news.news.dto.response.ResponseMessage;
+import com.news.news.exception.RefreshTokenException;
+import com.news.news.model.RefreshToken;
 import com.news.news.model.Role;
 import com.news.news.model.RoleEnum;
 import com.news.news.model.User;
 import com.news.news.service.impl.JWTService;
+import com.news.news.service.impl.RefreshTokenService;
 import com.news.news.service.impl.RoleService;
 import com.news.news.service.impl.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -40,10 +45,14 @@ public class AuthController extends Controller {
     private JWTService jwtService;
 
     @Autowired
+    private RefreshTokenService refreshTokenService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<?> signup(@RequestBody @Valid UserDTO userDTO) throws Exception {
+    public ResponseEntity<?> signup(@RequestBody @Valid UserDTO userDTO, HttpServletResponse response)
+            throws Exception {
         if (userService.existsByEmail(userDTO.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("Email have already existed"), HttpStatus.CONFLICT);
         } else {
@@ -59,26 +68,54 @@ public class AuthController extends Controller {
             }
 
             String jwt = jwtService.generateToken(newUser);
-            JwtAuthenticationResponse response = new JwtAuthenticationResponse(newUser);
-            response.setAccessToken(jwt);
-            return ResponseEntity.ok(response);
+            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(newUser);
+
+            jwtResponse.setAccessToken(jwt);
+
+            Cookie refreshTokenCookie = refreshTokenService.createRTCookie(newUser);
+            response.addCookie(refreshTokenCookie);
+
+            return ResponseEntity.ok(jwtResponse);
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO loginDTO) throws Exception {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO loginDTO, HttpServletResponse response)
+            throws Exception {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails user = (UserDetails) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
 
         String jwt = jwtService.generateToken(user);
+        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(user);
+        jwtResponse.setAccessToken(jwt);
 
-        JwtAuthenticationResponse response = new JwtAuthenticationResponse(user);
-        response.setAccessToken(jwt);
-        return ResponseEntity.ok(response);
+        Cookie refreshTokenCookie = refreshTokenService.createRTCookie(user);
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok(jwtResponse);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> getRefreshToken(
+            @CookieValue(RefreshTokenService.COOKIE_REFRESH_TOKEN) String cookieRFToken, HttpServletResponse response)
+            throws Exception {
+
+        return refreshTokenService.findByToken(cookieRFToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String jwt = jwtService.generateToken(user);
+                    JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(user);
+                    jwtResponse.setAccessToken(jwt);
+
+                    Cookie refreshTokenCookie = refreshTokenService.createRTCookie(user);
+                    response.addCookie(refreshTokenCookie);
+                    return ResponseEntity.ok(jwtResponse);
+                })
+                .orElseThrow(() -> new RefreshTokenException(cookieRFToken, "RToken is invalid"));
+    }
 }

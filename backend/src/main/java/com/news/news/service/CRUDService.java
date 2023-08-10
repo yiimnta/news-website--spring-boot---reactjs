@@ -7,9 +7,9 @@ public interface CRUDService<T> {
 
     List<T> findAll();
 
-    Optional<T> findById(Long id);
+    Optional<T> findById(long id);
 
     T save(T t);
 
-    void delete(Long id);
+    void delete(long id);
 }

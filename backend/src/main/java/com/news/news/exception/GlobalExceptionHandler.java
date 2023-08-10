@@ -1,5 +1,6 @@
 package com.news.news.exception;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,8 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
-import com.news.news.dto.response.ResponseMessage;
+import com.news.news.dto.response.ErrorMessage;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,9 +38,24 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseMessage handleUsernameNotFound(BadCredentialsException ex) {
+    public ErrorMessage handleUsernameNotFound(BadCredentialsException ex, WebRequest webRequest) {
 
-        return new ResponseMessage(ex.getMessage());
+        return new ErrorMessage(
+                HttpStatus.FORBIDDEN.value(),
+                new Date(),
+                ex.getMessage(),
+                webRequest.getDescription(false));
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(RefreshTokenException.class)
+    public ErrorMessage handleRefreshTokenException(RefreshTokenException ex, WebRequest webRequest) {
+
+        return new ErrorMessage(
+                HttpStatus.FORBIDDEN.value(),
+                new Date(),
+                ex.getMessage(),
+                webRequest.getDescription(false));
     }
 
 }

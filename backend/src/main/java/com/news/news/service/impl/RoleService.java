@@ -24,7 +24,7 @@ public class RoleService implements IRoleService, CRUDService<Role> {
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
+    public Optional<Role> findById(long id) {
         return roleRepository.findById(id);
     }
 
@@ -34,7 +34,7 @@ public class RoleService implements IRoleService, CRUDService<Role> {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         roleRepository.deleteById(id);
     }
 
