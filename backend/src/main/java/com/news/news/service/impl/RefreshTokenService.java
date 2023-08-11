@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.news.news.exception.RefreshTokenException;
 import com.news.news.model.RefreshToken;
 import com.news.news.model.User;
 import com.news.news.repository.RefreshTokenRepository;
@@ -41,11 +40,17 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
 
     @Override
     public RefreshToken generateRefreshToken(User user) {
-        String token = UUID.randomUUID().toString();
-        Instant expiryDate = Instant.now().plusMillis(refreshTokenExpiryTime * 1000);
-        RefreshToken refreshToken = new RefreshToken(token, user, expiryDate);
 
-        return refreshTokenRepository.save(refreshToken);
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user).orElse(null);
+
+        if (refreshToken == null || this.verifyExpiration(refreshToken)) {
+            String token = UUID.randomUUID().toString();
+            Instant expiryDate = Instant.now().plusMillis(refreshTokenExpiryTime * 1000);
+            refreshToken = new RefreshToken(token, user, expiryDate);
+            refreshTokenRepository.save(refreshToken);
+        }
+
+        return refreshToken;
     }
 
     public RefreshToken generateRefreshToken(long userId) {
@@ -59,14 +64,14 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
     }
 
     @Override
-    public RefreshToken verifyExpiration(RefreshToken token) {
+    public boolean verifyExpiration(RefreshToken token) {
 
         if (token.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.delete(token);
-            throw new RefreshTokenException(token.getToken(), "Refresh token was expired!");
+            return true;
         }
 
-        return token;
+        return false;
     }
 
     @Override
@@ -104,10 +109,14 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
 
     public Cookie createRTCookie(User user) {
         String refreshToken = this.generateRefreshToken(user.getId()).getToken();
+        return createRTCookie(user, refreshToken);
+    }
+
+    public Cookie createRTCookie(User user, String refreshToken) {
         Cookie rfTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN, refreshToken);
         rfTokenCookie.setHttpOnly(true);
         rfTokenCookie.setMaxAge(refreshTokenExpiryTime);
-        // rfTokenCookie.setSecure(true);
+        // rfTokenCookie.setSecure(true); for https
 
         return rfTokenCookie;
     }

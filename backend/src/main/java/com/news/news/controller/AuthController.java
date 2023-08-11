@@ -104,18 +104,24 @@ public class AuthController extends Controller {
             @CookieValue(RefreshTokenService.COOKIE_REFRESH_TOKEN) String cookieRFToken, HttpServletResponse response)
             throws Exception {
 
-        return refreshTokenService.findByToken(cookieRFToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String jwt = jwtService.generateToken(user);
-                    JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(user);
-                    jwtResponse.setAccessToken(jwt);
+        RefreshToken refreshToken = refreshTokenService.findByToken(cookieRFToken).orElse(null);
 
-                    Cookie refreshTokenCookie = refreshTokenService.createRTCookie(user);
-                    response.addCookie(refreshTokenCookie);
-                    return ResponseEntity.ok(jwtResponse);
-                })
-                .orElseThrow(() -> new RefreshTokenException(cookieRFToken, "RToken is invalid"));
+        if (refreshToken == null) {
+            throw new RefreshTokenException(cookieRFToken, "RToken is invalid");
+        }
+
+        if (refreshTokenService.verifyExpiration(refreshToken)) {
+            throw new RefreshTokenException(cookieRFToken, "Refresh token was expired!");
+        }
+
+        User user = refreshToken.getUser();
+        String jwt = jwtService.generateToken(user);
+        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(user);
+        jwtResponse.setAccessToken(jwt);
+
+        Cookie refreshTokenCookie = refreshTokenService.createRTCookie(user, refreshToken.getToken());
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok(jwtResponse);
     }
 }

@@ -13,7 +13,7 @@ public interface IRefreshTokenService {
 
     RefreshToken generateRefreshToken(User user);
 
-    void verifyExpiration(RefreshToken token);
+    boolean verifyExpiration(RefreshToken token);
 
     boolean deleteByUserId(long userId);
 

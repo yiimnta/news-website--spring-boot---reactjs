@@ -51,6 +51,7 @@ export default function Login() {
         if (errs.response?.data) {
           const err: LoginError[] = [];
           const data = errs.response?.data;
+
           for (const k in data) {
             const message: string = `${k !== "message" ? k : ""} ${data[k]}`;
             err.push({

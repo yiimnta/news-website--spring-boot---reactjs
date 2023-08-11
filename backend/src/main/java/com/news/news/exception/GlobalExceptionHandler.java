@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import com.news.news.dto.response.ErrorMessage;
+
+import io.jsonwebtoken.ExpiredJwtException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -37,19 +40,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(BadCredentialsException.class)
-    public ErrorMessage handleUsernameNotFound(BadCredentialsException ex, WebRequest webRequest) {
-
-        return new ErrorMessage(
-                HttpStatus.FORBIDDEN.value(),
-                new Date(),
-                ex.getMessage(),
-                webRequest.getDescription(false));
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(RefreshTokenException.class)
-    public ErrorMessage handleRefreshTokenException(RefreshTokenException ex, WebRequest webRequest) {
+    @ExceptionHandler({ ExpiredJwtException.class, RefreshTokenException.class, BadCredentialsException.class })
+    public ErrorMessage handleAuthenticationException(Exception ex, WebRequest webRequest) {
 
         return new ErrorMessage(
                 HttpStatus.FORBIDDEN.value(),
