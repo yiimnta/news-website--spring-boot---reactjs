@@ -1,20 +1,26 @@
-// import { Outlet } from "react-router-dom";
-// import { useState, useEffect } from "react";
-// import useAuth from "../hooks/useAuth";
+import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+import useAuth from "../hooks/useAuth";
+import { useRefreshToken } from "../hooks/useRefreshToken";
 
-// const PresistLogin = () => {
+export const PersistLogin = () => {
+  const { auth } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const refresh = useRefreshToken();
 
-//     const [isLoading, setIsLoading] = useState(true);
-//     const { auth } = useAuth();
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        return await refresh();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//     useEffect(() => {
-//         const verifyToken = async () => {
+    !auth?.accessToken ? getToken() : setLoading(false);
+  }, []);
 
-//             try {
-//                 await refresh();
-//             } catch (error) {
-//                 console.log(error);
-//             }
-//         }
-//     }, [])
-// }
+  return <>{loading ? <div>Loading</div> : <Outlet />}</>;
+};

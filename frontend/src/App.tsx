@@ -8,6 +8,7 @@ import NotFound from "./NotFound";
 import UserManager from "./components/admin/users/UserManager";
 import RequireAuth from "./components/RequireAuth";
 import { DashboardPage } from "./components/admin/dashboard/DashboardPage";
+import { PersistLogin } from "./components/PersistLogin";
 
 const ROLES = {
   MOD: "ROLE_MOD",
@@ -20,14 +21,16 @@ function App() {
     <>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<HomePage />} />
         <Route path="*" element={<NotFound />} />
-        <Route element={<DashboardPage />}>
-          <Route path="/admin/users2" element={<UserManager />} />
-        </Route>
-        <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
+        <Route element={<PersistLogin />}>
+          <Route path="/" element={<HomePage />} />
           <Route element={<DashboardPage />}>
-            <Route path="/admin/users" element={<UserManager />} />
+            <Route path="/admin/users2" element={<UserManager />} />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
+            <Route element={<DashboardPage />}>
+              <Route path="/admin/users" element={<UserManager />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

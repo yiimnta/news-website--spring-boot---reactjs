@@ -3,11 +3,12 @@ import { useForm } from "react-hook-form";
 import "./Login.scss";
 import AuthService from "../../services/AuthService";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import axios from "axios";
 import { User } from "../../contexts/AuthProvider";
 import useAuth from "../../hooks/useAuth";
+import { HTTPSTATUS_CODES } from "../../hooks/usePrivateAxios";
 
 type FormValues = {
   email: string;
@@ -52,11 +53,18 @@ export default function Login() {
           const err: LoginError[] = [];
           const data = errs.response?.data;
 
-          for (const k in data) {
-            const message: string = `${k !== "message" ? k : ""} ${data[k]}`;
+          if (data.status === HTTPSTATUS_CODES.FORBIDDEN) {
             err.push({
-              message: message.charAt(0).toUpperCase() + message.slice(1),
+              message:
+                data.message.charAt(0).toUpperCase() + data.message.slice(1),
             });
+          } else {
+            for (const k in data) {
+              const message: string = `${k !== "message" ? k : ""} ${data[k]}`;
+              err.push({
+                message: message.charAt(0).toUpperCase() + message.slice(1),
+              });
+            }
           }
 
           setLoginErrors(err);
@@ -66,6 +74,23 @@ export default function Login() {
       }
     }
   };
+
+  useEffect(() => {
+    const handleEnterSubmit = (e: {
+      code: string;
+      preventDefault: () => void;
+    }) => {
+      if (e.code === "Enter") {
+        e.preventDefault();
+        handleSubmit(onSubmit);
+      }
+    };
+    window.addEventListener("keydown", handleEnterSubmit);
+
+    return () => {
+      window.removeEventListener("keydown", handleEnterSubmit);
+    };
+  }, []);
 
   return (
     <>

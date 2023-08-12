@@ -3,6 +3,17 @@ import { PrivateAxios } from "../services/AxiosService";
 import useAuth from "./useAuth";
 import { useRefreshToken } from "./useRefreshToken";
 
+export const HTTPSTATUS_CODES = {
+  OK: 200,
+  CREATED: 201,
+  ACCEPTED: 202,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  REQUEST_TIMEOUT: 408,
+  CONFLICT: 409,
+};
+
 export const usePrivateAxios = () => {
   const { auth } = useAuth();
   const refresh = useRefreshToken();
@@ -18,12 +29,15 @@ export const usePrivateAxios = () => {
     const responseIntercept = PrivateAxios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const previousRequest = error?.config;
-        if (error?.response?.status === 403 && !previousRequest?.sent) {
-          previousRequest.sent = true;
+        const prevRequest = error?.config;
+        if (
+          error?.response?.status === HTTPSTATUS_CODES.UNAUTHORIZED &&
+          !prevRequest?.sent
+        ) {
+          prevRequest.sent = true;
           const newAccessToken = await refresh();
-          previousRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return previousRequest;
+          prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return PrivateAxios(prevRequest);
         }
         return Promise.reject(error);
       }

@@ -1,13 +1,10 @@
 package com.news.news.security;
 
 import java.io.IOException;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import com.news.news.dto.response.ErrorMessage;
 import com.news.news.service.impl.JWTService;
 import com.news.news.service.impl.UserService;
 
@@ -67,6 +63,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
+            logger.error("Jwt Token is expired", e);
             handlerExceptionResolver.resolveException(request, response, null, e);
             return;
         } catch (Exception e) {

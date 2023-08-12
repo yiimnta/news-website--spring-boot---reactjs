@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -51,7 +52,7 @@ public class SecurityConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         request -> request.requestMatchers("/public/**", "/auth/**", "/login").permitAll()
                                 .anyRequest().authenticated())
@@ -61,4 +62,18 @@ public class SecurityConfigurer {
 
         return http.build();
     }
+
+    // @Bean
+    // CorsConfigurationSource corsConfigurationSource() {
+    // CorsConfiguration configuration = new CorsConfiguration();
+    // configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173",
+    // "http://127.0.0.1:5173"));
+    // configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT",
+    // "DELETE"));
+    // configuration.setAllowedHeaders(Arrays.asList("Authorization"));
+    // UrlBasedCorsConfigurationSource source = new
+    // UrlBasedCorsConfigurationSource();
+    // source.registerCorsConfiguration("/**", configuration);
+    // return source;
+    // }
 }

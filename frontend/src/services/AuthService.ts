@@ -5,18 +5,8 @@ const login = (email: string, password: string) => {
     return PublicAxios.post("/auth/login", data)
 }
 
-const refresh = (token: string) => {
-    return PublicAxios.get("/auth/refresh", {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-}
-
 const AuthService = {
-    login,
-    refresh
+    login
 }
 
 export default AuthService

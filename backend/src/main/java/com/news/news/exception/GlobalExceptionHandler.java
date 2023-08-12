@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -40,11 +39,22 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler({ ExpiredJwtException.class, RefreshTokenException.class, BadCredentialsException.class })
+    @ExceptionHandler({ RefreshTokenException.class, BadCredentialsException.class })
     public ErrorMessage handleAuthenticationException(Exception ex, WebRequest webRequest) {
 
         return new ErrorMessage(
                 HttpStatus.FORBIDDEN.value(),
+                new Date(),
+                ex.getMessage(),
+                webRequest.getDescription(false));
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ErrorMessage handleExpiredJwtException(ExpiredJwtException ex, WebRequest webRequest) {
+
+        return new ErrorMessage(
+                HttpStatus.UNAUTHORIZED.value(),
                 new Date(),
                 ex.getMessage(),
                 webRequest.getDescription(false));
