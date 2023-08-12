@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import { useRefreshToken } from "../hooks/useRefreshToken";
+import { LoadingPage } from "./public/loading/LoadingPage";
 
 export const PersistLogin = () => {
   const { auth } = useAuth();
@@ -22,5 +23,5 @@ export const PersistLogin = () => {
     !auth?.accessToken ? getToken() : setLoading(false);
   }, []);
 
-  return <>{loading ? <div>Loading</div> : <Outlet />}</>;
+  return <>{loading ? <LoadingPage /> : <Outlet />}</>;
 };

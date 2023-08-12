@@ -18,7 +18,6 @@ export default function HomePage() {
       });
 
       if (response?.data) {
-        console.log(response.data);
         const u: TUser[] = [];
         response.data.forEach((e: { firstname: string; lastname: string }) => {
           u.push({ name: `${e.firstname} ${e.lastname}` });
@@ -33,6 +32,10 @@ export default function HomePage() {
     };
 
     getUsers();
+
+    return () => {
+      arbortController.abort();
+    };
   }, []);
 
   return (

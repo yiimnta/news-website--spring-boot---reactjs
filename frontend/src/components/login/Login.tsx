@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import "./Login.scss";
 import AuthService from "../../services/AuthService";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AxiosError } from "axios";
 import axios from "axios";
 import { User } from "../../contexts/AuthProvider";
@@ -26,6 +26,7 @@ export default function Login() {
   const location = useLocation();
   const fromLocation = location.state?.from?.pathname || "/";
   const { setAuth } = useAuth();
+  const btnSubmitRef = useRef<HTMLInputElement>();
 
   const { register, handleSubmit, formState, reset } = useForm<FormValues>({
     defaultValues: {
@@ -82,7 +83,7 @@ export default function Login() {
     }) => {
       if (e.code === "Enter") {
         e.preventDefault();
-        handleSubmit(onSubmit);
+        btnSubmitRef.current && btnSubmitRef.current.click();
       }
     };
     window.addEventListener("keydown", handleEnterSubmit);
@@ -147,7 +148,9 @@ export default function Login() {
               />
             </Form.Check>
           </div>
-          <Button onClick={handleSubmit(onSubmit)}>Login</Button>
+          <Button ref={btnSubmitRef} onClick={handleSubmit(onSubmit)}>
+            Login
+          </Button>
           {loginErrors.length > 0 && (
             <div className="error-list">
               {loginErrors.map((e, i) => (
