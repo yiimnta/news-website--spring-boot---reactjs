@@ -22,8 +22,8 @@ public class JWTService implements IJWTService {
     @Value("${token.signing.key}")
     private String jwtSigningKey;
 
-    @Value("${token.expiration.time}")
-    private long expirationTime;
+    @Value("${token.expiration.ms}")
+    private long expirationTimeMS;
 
     @Override
     public String extractEmail(String token) {
@@ -36,7 +36,7 @@ public class JWTService implements IJWTService {
         return Jwts.builder()
                 .setSubject(userdetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMS))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

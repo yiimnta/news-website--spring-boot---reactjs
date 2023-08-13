@@ -20,5 +20,5 @@ public class LoginDTO {
     @Size(min = 6)
     private String password;
 
-    private Boolean savesPassword;
+    private Boolean rememberMe;
 }

@@ -29,6 +29,7 @@ import com.news.news.service.impl.RoleService;
 import com.news.news.service.impl.UserService;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -73,8 +74,7 @@ public class AuthController extends Controller {
 
             jwtResponse.setAccessToken(jwt);
 
-            Cookie refreshTokenCookie = refreshTokenService.createRTCookie(newUser);
-            response.addCookie(refreshTokenCookie);
+            refreshTokenService.addRTCookie(response, newUser, true);
 
             return ResponseEntity.ok(jwtResponse);
         }
@@ -95,15 +95,16 @@ public class AuthController extends Controller {
         JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(user);
         jwtResponse.setAccessToken(jwt);
 
-        Cookie refreshTokenCookie = refreshTokenService.createRTCookie(user);
-        response.addCookie(refreshTokenCookie);
+        refreshTokenService.addRTCookie(response, user, loginDTO.getRememberMe());
 
         return ResponseEntity.ok(jwtResponse);
     }
 
     @GetMapping("/refresh")
     public ResponseEntity<JwtAuthenticationResponse> getRefreshToken(
-            @CookieValue(RefreshTokenService.COOKIE_REFRESH_TOKEN) String cookieRFToken, HttpServletResponse response)
+            @CookieValue(RefreshTokenService.COOKIE_REFRESH_TOKEN) String cookieRFToken,
+            @CookieValue(RefreshTokenService.COOKIE_REMEMBER_ME) String cookieRememberMe,
+            HttpServletResponse response)
             throws Exception {
 
         RefreshToken refreshToken = refreshTokenService.findByToken(cookieRFToken).orElse(null);
@@ -121,8 +122,8 @@ public class AuthController extends Controller {
         JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(user);
         jwtResponse.setAccessToken(jwt);
 
-        Cookie refreshTokenCookie = refreshTokenService.createRTCookie(user, refreshToken.getToken());
-        response.addCookie(refreshTokenCookie);
+        refreshTokenService.addRTCookie(response, user, refreshToken.getToken(),
+                Boolean.parseBoolean(cookieRememberMe));
 
         return ResponseEntity.ok(jwtResponse);
     }

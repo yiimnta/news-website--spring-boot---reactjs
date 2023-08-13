@@ -17,15 +17,20 @@ import com.news.news.service.CRUDService;
 import com.news.news.service.IRefreshTokenService;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 @Service
 public class RefreshTokenService implements IRefreshTokenService, CRUDService<RefreshToken> {
 
     public static final String COOKIE_REFRESH_TOKEN = "refresh_token";
+    public static final String COOKIE_REMEMBER_ME = "rememberme";
 
-    @Value("${refreshtoken.expiration.time}")
-    private int refreshTokenExpiryTime;
+    @Value("${refreshtoken.expiration.ms}")
+    private int refreshTokenExpiryTimeMS;
+
+    @Value("${cookie.expiration.sec}")
+    private int cookieExpriyTimeSec;
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
@@ -45,7 +50,7 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
 
         if (refreshToken == null || this.verifyExpiration(refreshToken)) {
             String token = UUID.randomUUID().toString();
-            Instant expiryDate = Instant.now().plusMillis(refreshTokenExpiryTime * 1000);
+            Instant expiryDate = Instant.now().plusMillis(refreshTokenExpiryTimeMS);
             refreshToken = new RefreshToken(token, user, expiryDate);
             refreshTokenRepository.save(refreshToken);
         }
@@ -107,18 +112,46 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
         return refreshTokenRepository.deleteByUser(user);
     }
 
-    public Cookie createRTCookie(User user) {
+    // public Cookie createRTCookie(User user, int age) {
+    // String refreshToken = this.generateRefreshToken(user.getId()).getToken();
+    // return createRTCookie(user, refreshToken, age);
+    // }
+
+    // public Cookie createRTCookie(User user) {
+    // String refreshToken = this.generateRefreshToken(user.getId()).getToken();
+    // return createRTCookie(user, refreshToken, cookieExpriyTimeSec);
+    // }
+
+    // public Cookie createRTCookie(User user, String refreshToken, int age) {
+    // Cookie rfTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN, refreshToken);
+    // rfTokenCookie.setHttpOnly(true);
+    // rfTokenCookie.setMaxAge(cookieExpriyTimeSec);
+    // rfTokenCookie.setSecure(true);
+
+    // return rfTokenCookie;
+    // }
+
+    public void addRTCookie(HttpServletResponse response, User user, boolean rememberMe) {
         String refreshToken = this.generateRefreshToken(user.getId()).getToken();
-        return createRTCookie(user, refreshToken);
+        addRTCookie(response, user, refreshToken, rememberMe);
     }
 
-    public Cookie createRTCookie(User user, String refreshToken) {
+    public void addRTCookie(HttpServletResponse response, User user, String refreshToken, boolean rememberMe) {
+
+        int expiryAge = rememberMe ? cookieExpriyTimeSec : -1;
         Cookie rfTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN, refreshToken);
         rfTokenCookie.setHttpOnly(true);
-        rfTokenCookie.setMaxAge(refreshTokenExpiryTime);
-        // rfTokenCookie.setSecure(true); for https
+        rfTokenCookie.setMaxAge(expiryAge);
+        rfTokenCookie.setSecure(true);
 
-        return rfTokenCookie;
+        response.addCookie(rfTokenCookie);
+
+        Cookie rememberMeCookie = new Cookie(COOKIE_REMEMBER_ME, String.valueOf(rememberMe));
+        rememberMeCookie.setHttpOnly(true);
+        rememberMeCookie.setMaxAge(expiryAge);
+        rememberMeCookie.setSecure(true);
+
+        response.addCookie(rememberMeCookie);
     }
 
 }

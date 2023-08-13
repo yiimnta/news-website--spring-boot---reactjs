@@ -13,7 +13,7 @@ import { HTTPSTATUS_CODES } from "../../hooks/usePrivateAxios";
 type FormValues = {
   email: string;
   password: string;
-  rememberme: boolean;
+  rememberMe: boolean;
 };
 
 type LoginError = {
@@ -26,13 +26,13 @@ export default function Login() {
   const location = useLocation();
   const fromLocation = location.state?.from?.pathname || "/";
   const { setAuth } = useAuth();
-  const btnSubmitRef = useRef<HTMLInputElement>();
+  const btnSubmitRef = useRef<HTMLButtonElement>(null);
 
   const { register, handleSubmit, formState, reset } = useForm<FormValues>({
     defaultValues: {
       email: "",
       password: "",
-      rememberme: false,
+      rememberMe: false,
     },
   });
 
@@ -41,7 +41,11 @@ export default function Login() {
   const onSubmit = async (formData: FormValues) => {
     setLoginErrors(() => []);
     try {
-      const res = await AuthService.login(formData.email, formData.password);
+      const res = await AuthService.login(
+        formData.email,
+        formData.password,
+        formData.rememberMe
+      );
       const data: User = res.data;
       setAuth(data);
       reset();
@@ -144,7 +148,7 @@ export default function Login() {
                 label="remember me?"
                 id="rememberme"
                 type="checkbox"
-                {...register("rememberme", {})}
+                {...register("rememberMe", {})}
               />
             </Form.Check>
           </div>
