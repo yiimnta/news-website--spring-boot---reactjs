@@ -38,7 +38,6 @@
 
 #dashboard {
     width: 100vw;
-    height: 100vh;
     font-family: poppins, sans-serif;
     font-size: 0.88rem;
     background-color: var(--color-background);
@@ -129,8 +128,8 @@
         width: 96%;
         margin: 0 auto;
         background-color: var(--color-background);
-        gap: 1.8rem;
         grid-template-columns: 14rem auto 23rem;
+        max-width: 1920px;
 
         aside {
             height: 100vh;
@@ -162,7 +161,6 @@
             .sidebar {
                 display: flex;
                 flex-direction: column;
-                height: 86vh;
                 position: relative;
                 top: 3rem;
 
@@ -181,12 +179,7 @@
                         transition: all 300ms ease;
                     }
 
-                    &:last-child {
-                        position: absolute;
-                        width: 100%;
-                        bottom: 2rem;
-                        color:var(--color-primary);
-                    }
+                    
 
                     &.active {
                         background: var(--color-light);
@@ -215,21 +208,36 @@
                     }
                 }
             }
+
+            .logout-btn {
+                position: absolute!important;
+                bottom: 2rem;
+                color:var(--color-primary);
+                margin-left: 2rem;
+                gap: 1rem;
+                align-items: center;
+                position: relative;
+                height: 3.7rem;
+                transition: all 300ms ease;
+                display: flex;
+            }
         }
         
         main {
             margin-top: 1.4rem;
+            padding: 2rem;
 
             .date {
                 display: inline-block;
                 background-color: var(--color-light);
                 border-radius: var(--border-radius-1);
                 margin-top: 1rem;
-                padding: 0.5rem 1.6rem;
+                padding: 0.5rem 0 0.5rem 0;
                 
                 input[type="date"] {
                     background-color: transparent;
                     color: var(--color-dark);
+                    padding-left: 15px;
                 }
             }
 
@@ -470,11 +478,6 @@
                 a {
                     width: 100%;
                     height: 3.4rem;
-
-                    &:last-child {
-                        position: absolute;
-                        bottom: 5rem;
-                    }
                 }
             }
 

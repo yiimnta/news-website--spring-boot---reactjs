@@ -15,13 +15,15 @@ export const DashboardMain = () => {
   return (
     <main>
       <h1>Dashboard</h1>
-      <div className="date text-center">
+      <div className="date">
         <input
+          className="text-center"
           type="date"
           {...register("date", {
             valueAsDate: false,
           })}
           disabled
+          style={{ paddingLeft: "15px" }}
         />
       </div>
 

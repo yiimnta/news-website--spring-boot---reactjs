@@ -28,8 +28,6 @@ import com.news.news.service.impl.RefreshTokenService;
 import com.news.news.service.impl.RoleService;
 import com.news.news.service.impl.UserService;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 

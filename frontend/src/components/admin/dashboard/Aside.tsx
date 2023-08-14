@@ -72,11 +72,11 @@ export const Aside = () => {
           <Person4SharpIcon />
           <h3>Users</h3>
         </a>
-        <a href="#">
-          <LogoutSharpIcon />
-          <h3>Logout</h3>
-        </a>
       </div>
+      <a href="#" className="logout-btn">
+        <LogoutSharpIcon />
+        <h3>Logout</h3>
+      </a>
     </aside>
   );
 };

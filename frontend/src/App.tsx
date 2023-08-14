@@ -23,12 +23,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<NotFound />} />
         <Route element={<PersistLogin />}>
-          <Route element={<DashboardPage />}>
-            <Route path="/admin/users2" element={<UserManager />} />
-          </Route>
+          <Route path="/" element={<HomePage />} />
           <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
-            <Route path="/" element={<HomePage />} />
             <Route element={<DashboardPage />}>
+              <Route path="/admin/users2" element={<UserManager />} />
               <Route path="/admin/users" element={<UserManager />} />
             </Route>
           </Route>

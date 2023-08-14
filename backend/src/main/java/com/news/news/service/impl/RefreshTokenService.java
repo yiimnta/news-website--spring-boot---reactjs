@@ -138,7 +138,8 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
 
     public void addRTCookie(HttpServletResponse response, User user, String refreshToken, boolean rememberMe) {
 
-        int expiryAge = rememberMe ? cookieExpriyTimeSec : -1;
+        int expiryAge = rememberMe ? cookieExpriyTimeSec : -1; // -1 means that cookie will be stored in session (will
+                                                               // be clear after closing browser)
         Cookie rfTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN, refreshToken);
         rfTokenCookie.setHttpOnly(true);
         rfTokenCookie.setMaxAge(expiryAge);
