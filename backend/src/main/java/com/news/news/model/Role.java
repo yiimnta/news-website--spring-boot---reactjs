@@ -19,8 +19,16 @@ public class Role {
 
     private String name;
 
+    private String color;
+
     public Role(String name) {
         this.name = name;
+        this.color = "#000";
+    }
+
+    public Role(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
 }

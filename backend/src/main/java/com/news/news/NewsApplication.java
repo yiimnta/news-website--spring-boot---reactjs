@@ -29,13 +29,13 @@ public class NewsApplication {
         List<Role> roles = (List<Role>) roleService.findAll();
 
         if (roles.isEmpty()) {
-            Role adminRole = new Role(RoleEnum.ADMIN.getName());
+            Role adminRole = new Role(RoleEnum.ADMIN.getName(), "#ff7782");
             roleService.save(adminRole);
 
-            Role modRole = new Role(RoleEnum.MOD.getName());
+            Role modRole = new Role(RoleEnum.MOD.getName(), "#74f1b6");
             roleService.save(modRole);
 
-            Role memberRole = new Role(RoleEnum.MEMBER.getName());
+            Role memberRole = new Role(RoleEnum.MEMBER.getName(), "#363949");
             roleService.save(memberRole);
         }
     }

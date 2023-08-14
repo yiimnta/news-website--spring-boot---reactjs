@@ -1,10 +1,15 @@
 import React, { useState, createContext } from "react";
 
+type Role = {
+  name: string;
+  color: string;
+};
+
 export type User = {
   firstname: string;
   lastname: string;
   email: string;
-  roles: string[];
+  roles: Role[];
   accessToken: string;
 };
 

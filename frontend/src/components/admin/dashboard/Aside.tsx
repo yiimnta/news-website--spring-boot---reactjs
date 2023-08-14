@@ -3,6 +3,9 @@ import ClearSharpIcon from "@mui/icons-material/ClearSharp";
 import GridViewSharpIcon from "@mui/icons-material/GridViewSharp";
 import Person4SharpIcon from "@mui/icons-material/Person4Sharp";
 import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
+import NewspaperIcon from "@mui/icons-material/Newspaper";
+import ContactsIcon from "@mui/icons-material/Contacts";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useContext } from "react";
 import { DashboardContext } from "../../../contexts/DashboardProvider";
 
@@ -61,16 +64,16 @@ export const Aside = () => {
           <h3>Users</h3>
         </a>
         <a href="#">
-          <Person4SharpIcon />
-          <h3>Users</h3>
+          <NewspaperIcon />
+          <h3>News</h3>
+        </a>
+        <a href="#">
+          <ContactsIcon />
+          <h3>Contacts</h3>
         </a>
         <a href="#">
           <Person4SharpIcon />
-          <h3>Users</h3>
-        </a>
-        <a href="#">
-          <Person4SharpIcon />
-          <h3>Users</h3>
+          <h3>SettingsIcon</h3>
         </a>
       </div>
       <a href="#" className="logout-btn">

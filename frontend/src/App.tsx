@@ -9,12 +9,8 @@ import UserManager from "./components/admin/users/UserManager";
 import RequireAuth from "./components/RequireAuth";
 import { DashboardPage } from "./components/admin/dashboard/DashboardPage";
 import { PersistLogin } from "./components/PersistLogin";
-
-const ROLES = {
-  MOD: "ROLE_MOD",
-  MEMBER: "ROLE_MEMBER",
-  ADMIN: "ROLE_ADMIN",
-};
+import NewsManager from "./components/admin/news/NewsManager";
+import { ROLES } from "./Constants";
 
 function App() {
   return (
@@ -26,7 +22,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
             <Route element={<DashboardPage />}>
-              <Route path="/admin/users2" element={<UserManager />} />
+              <Route path="/admin/news" element={<NewsManager />} />
               <Route path="/admin/users" element={<UserManager />} />
             </Route>
           </Route>

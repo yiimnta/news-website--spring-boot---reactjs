@@ -3,9 +3,12 @@ import ListSharpIcon from "@mui/icons-material/ListSharp";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import NightlightIcon from "@mui/icons-material/Nightlight";
 import { DashboardContext } from "../../../contexts/DashboardProvider";
+import useAuth from "../../../hooks/useAuth";
+import { ROLES } from "../../../Constants";
 
 export const DashboardHeader = () => {
   const { show, setShow, darkMode, setDarkMode } = useContext(DashboardContext);
+  const { auth } = useAuth();
 
   return (
     <div className="top">
@@ -25,9 +28,36 @@ export const DashboardHeader = () => {
       <div className="profile">
         <div className="info">
           <p>
-            Hey <b>Remu</b>
+            <b>{auth && auth.firstname + " " + auth.lastname}</b>
           </p>
-          <small className="text-muted">Admin</small>
+          <small className="text-muted">
+            {auth && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "0.2rem",
+                }}
+              >
+                {auth.roles.map((e) => {
+                  for (const k in ROLES) {
+                    if (ROLES[k] === e.name) {
+                      return (
+                        <span className="role">
+                          <span
+                            className="circle"
+                            style={{ background: `${e.color}` }}
+                          ></span>{" "}
+                          {k}
+                        </span>
+                      );
+                    }
+                  }
+                  return "";
+                })}
+              </div>
+            )}
+          </small>
         </div>
         <div className="profile-photo">
           <img
