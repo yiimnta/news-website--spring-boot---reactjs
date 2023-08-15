@@ -1,0 +1,24 @@
+#user-management {
+    .user-info-name {
+        display: flex;
+        gap: 1rem;
+    }
+
+
+    .role {
+        background: #f2fffd;
+        padding: 0.1rem 0.4rem;
+        border-radius: 5px;
+        color: var(--color-primary);
+        border: 1px solid #c1cbf9;
+        font-size: 12px;
+
+        .circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 3px;
+        }
+    }
+}

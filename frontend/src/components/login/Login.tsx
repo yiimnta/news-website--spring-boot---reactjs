@@ -6,9 +6,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { AxiosError } from "axios";
 import axios from "axios";
-import { User } from "../../contexts/AuthProvider";
 import useAuth from "../../hooks/useAuth";
 import { HTTPSTATUS_CODES } from "../../hooks/usePrivateAxios";
+import { AuthUser } from "../../Constants";
 
 type FormValues = {
   email: string;
@@ -46,7 +46,7 @@ export default function Login() {
         formData.password,
         formData.rememberMe
       );
-      const data: User = res.data;
+      const data: AuthUser = res.data;
       setAuth(data);
       reset();
       navigate(fromLocation, { replace: true });

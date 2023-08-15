@@ -17,21 +17,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class JwtAuthenticationResponse {
+public class UserResponse {
 
-    public JwtAuthenticationResponse(User user) {
+    public UserResponse(User user) {
         BeanUtils.copyProperties(user, this);
         this.roles = new ArrayList<>();
         user.getRoles().stream().forEach(role -> {
-            roles.add(new RoleResponse(role.getName(), role.getColor()));
+            roles.add(new RoleResponse(role));
         });
     }
 
+    private long id;
     private String firstname;
     private String lastname;
     private String email;
     private String avatar;
     private List<RoleResponse> roles;
-    private String accessToken;
     private UserStatusEnum status;
+    private int age;
 }

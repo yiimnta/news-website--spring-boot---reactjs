@@ -39,19 +39,17 @@ export const DashboardHeader = () => {
                   gap: "0.2rem",
                 }}
               >
-                {auth.roles.map((e) => {
-                  for (const k in ROLES) {
-                    if (ROLES[k] === e.name) {
-                      return (
-                        <span className="role">
-                          <span
-                            className="circle"
-                            style={{ background: `${e.color}` }}
-                          ></span>{" "}
-                          {k}
-                        </span>
-                      );
-                    }
+                {auth.roles.map((e, index) => {
+                  if (ROLES[e.name]) {
+                    return (
+                      <span className="role" key={index}>
+                        <span
+                          className="circle"
+                          style={{ background: `${e.color}` }}
+                        ></span>{" "}
+                        {ROLES[e.name]}
+                      </span>
+                    );
                   }
                   return "";
                 })}
@@ -60,10 +58,7 @@ export const DashboardHeader = () => {
           </small>
         </div>
         <div className="profile-photo">
-          <img
-            src="https://i1.sndcdn.com/avatars-000289170128-n70qq7-t500x500.jpg"
-            alt="avatar"
-          />
+          <img src={auth.avatar} alt="avatar" />
         </div>
       </div>
     </div>

@@ -13,17 +13,18 @@
     --color-primary-variant: #111e88;
     --color-dark-variant: #677483;
     --color-background: #f6f6f9;
-    --color-title-table:#363949;
+    --color-title-table:#959799;
 
     --card-border-radius: 2rem;
     --border-radius-1: 0.4rem;
     --border-radius-2: 0.8rem;
     --border-radius-3: 1.2rem;
 
-    --card-padding: 1.8rem;
+    --card-padding: 1rem;
     --padding-1: 1.2rem;
 
     --box-shadow: 0 2rem 3rem var(--color-light);
+    --background-title-table: #f9fafb;
 }
 
 .dark-theme-variables {
@@ -34,6 +35,7 @@
     --color-light:rgba(0, 0, 0, 0.4);
     --box-shadow: 0 2rem 3rem var(--color-light);
     --color-title-table:var(--color-primary);
+    --background-title-table: #f9fafb;
 }
 
 #dashboard {
@@ -43,7 +45,6 @@
     background-color: var(--color-background);
     user-select: none;
     overflow-x: hidden;
-    transition: all 400ms ease;
     * {
         margin: 0;
         padding: 0;
@@ -261,14 +262,28 @@
                     color: var(--color-primary);
                 }
 
-                table {
+                .data-table {
                     background: var(--color-white);
                     width: 100%;
-                    border-radius: var(--card-border-radius);
-                    padding: var(--card-padding);
                     text-align: center;
                     box-shadow: var(--box-shadow);
                     transition: all 300ms ease;
+                    border: 1.5px solid #dddfe1;
+                    border-radius: 10px;
+                    border-collapse: separate!important;
+                    border-spacing: 0px;
+
+                    .text-left {
+                        text-align: left;
+                    }
+                    
+                    .text-center {
+                        text-align: center;
+                    }
+                    
+                    .text-right {
+                        text-align: right;
+                    }
 
                     &:hover {
                         box-shadow: none;
@@ -277,6 +292,20 @@
                     th {
                         padding: var(--card-padding);
                         color: var(--color-title-table);
+                        border-bottom: 1px solid var(--color-light);
+                        background-color: var(--background-title-table);
+                        text-transform: uppercase;
+                        font-weight: 500;
+
+                        &.top-left-radius {
+                            border-top-left-radius: 10px;
+                            border-left:#dddfe1;
+                        }
+
+                        &.top-right-radius {
+                            border-top-right-radius: 10px;
+                            border-right:#dddfe1;
+                        }
                     }
 
                     tbody {

@@ -1,7 +1,6 @@
 package com.news.news.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.news.news.dto.request.RoleUserDTO;
 import com.news.news.dto.request.UserDTO;
 import com.news.news.dto.response.ResponseMessage;
+import com.news.news.dto.response.UserResponse;
 import com.news.news.model.User;
 import com.news.news.service.impl.UserService;
 
@@ -36,21 +36,21 @@ public class UserController extends Controller {
         } else {
             User newUser = userService.saveUserRequest(userDTO);
 
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+            return new ResponseEntity<>(new UserResponse(newUser), HttpStatus.CREATED);
         }
     }
 
     @GetMapping
-    ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.findAll());
+    ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.findAll().stream().map(user -> new UserResponse(user)).toList());
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<User> getUser(@PathVariable Long id) {
+    ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
 
         User user = userService.findById(id).orElse(null);
         if (user != null) {
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(new UserResponse(user));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -70,12 +70,12 @@ public class UserController extends Controller {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
 
         User updatedUser = userService.updateUser(id, userDTO);
 
         if (updatedUser != null) {
-            return ResponseEntity.ok(updatedUser);
+            return ResponseEntity.ok(new UserResponse(updatedUser));
         } else {
             return ResponseEntity.notFound().build();
         }

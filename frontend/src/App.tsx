@@ -20,7 +20,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
         <Route element={<PersistLogin />}>
           <Route path="/" element={<HomePage />} />
-          <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
+          <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]} />}>
             <Route element={<DashboardPage />}>
               <Route path="/admin/news" element={<NewsManager />} />
               <Route path="/admin/users" element={<UserManager />} />

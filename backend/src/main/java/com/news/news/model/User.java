@@ -40,6 +40,7 @@ public class User implements UserDetails {
     private String firstname;
     private String lastname;
     private String email;
+    private UserStatusEnum status;
 
     @Lob
     private String avatar;
@@ -62,6 +63,7 @@ public class User implements UserDetails {
         this.age = age;
         this.gender = gender;
         this.password = password;
+        this.status = UserStatusEnum.ACTIVE;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return status == UserStatusEnum.ACTIVE;
     }
 
     @Override

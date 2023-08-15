@@ -1,21 +1,9 @@
 import React, { useState, createContext } from "react";
-
-type Role = {
-  name: string;
-  color: string;
-};
-
-export type User = {
-  firstname: string;
-  lastname: string;
-  email: string;
-  roles: Role[];
-  accessToken: string;
-};
+import { AuthUser } from "../Constants";
 
 export type IAuthContext = {
-  auth: User;
-  setAuth: React.Dispatch<React.SetStateAction<User>>;
+  auth: AuthUser;
+  setAuth: React.Dispatch<React.SetStateAction<AuthUser>>;
 };
 
 export const AuthContext = createContext<IAuthContext>({
@@ -25,6 +13,7 @@ export const AuthContext = createContext<IAuthContext>({
     email: "",
     roles: [],
     accessToken: "",
+    avatar: "",
   },
   setAuth: () => {},
 });
@@ -32,12 +21,13 @@ export const AuthContext = createContext<IAuthContext>({
 export const AuthProvider = (props: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [auth, setAuth] = useState<User>({
+  const [auth, setAuth] = useState<AuthUser>({
     firstname: "",
     lastname: "",
     email: "",
     roles: [],
     accessToken: "",
+    avatar: "",
   });
 
   const { children } = props;

@@ -72,8 +72,8 @@ export const Aside = () => {
           <h3>Contacts</h3>
         </a>
         <a href="#">
-          <Person4SharpIcon />
-          <h3>SettingsIcon</h3>
+          <SettingsIcon />
+          <h3>Settings</h3>
         </a>
       </div>
       <a href="#" className="logout-btn">
