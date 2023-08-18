@@ -1,7 +1,11 @@
 import "./App.css";
+import "react-toastify/dist/ReactToastify.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css"; //theme
+import "primereact/resources/primereact.min.css"; //core css
+import "primeicons/primeicons.css"; //icons
+
 import Login from "./components/login/Login";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./components/public/HomePage";
 import NotFound from "./NotFound";

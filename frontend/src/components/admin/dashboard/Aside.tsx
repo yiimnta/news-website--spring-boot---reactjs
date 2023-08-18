@@ -8,6 +8,7 @@ import ContactsIcon from "@mui/icons-material/Contacts";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useContext } from "react";
 import { DashboardContext } from "../../../contexts/DashboardProvider";
+import { DashboardDate } from "./DashboardDate";
 
 export const Aside = () => {
   const { show, setShow } = useContext(DashboardContext);
@@ -53,7 +54,7 @@ export const Aside = () => {
           </div>
         )}
       </div>
-
+      <DashboardDate />
       <div className="sidebar">
         <a href="#" className="active">
           <GridViewSharpIcon />

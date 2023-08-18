@@ -1,10 +1,8 @@
 import { useContext } from "react";
 import { Aside } from "./Aside";
-import { DashboardHeader } from "./DashboardHeader";
 
 import "./Dashboard.scss";
 import { DashboardMain } from "./DashboardMain";
-import { DashboardRecentUpdates } from "./DashboardRecentUpdates";
 import { DashboardContext } from "../../../contexts/DashboardProvider";
 
 export const Dashboard = () => {
@@ -16,10 +14,9 @@ export const Dashboard = () => {
       <div className="dashbard-container">
         <Aside />
         <DashboardMain />
-        <div className="right">
-          <DashboardHeader />
+        {/* <div className="right">
           <DashboardRecentUpdates />
-        </div>
+        </div> */}
       </div>
     </div>
   );

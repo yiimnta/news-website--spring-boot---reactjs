@@ -84,7 +84,6 @@
             border: 1px solid #c1cbf9;
             font-size: 12px;
             width: 100px;
-            margin-bottom: 0.05rem;
 
             .circle {
                 width: 10px;
@@ -97,4 +96,9 @@
     }
 
     
+}
+
+@media screen and (max-width: 1200px) {
+    #user-management {
+    }
 }

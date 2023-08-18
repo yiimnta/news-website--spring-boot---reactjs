@@ -39,22 +39,13 @@
 }
 
 #dashboard {
-    width: 100vw;
+    // width: 100vw;
     font-family: poppins, sans-serif;
     font-size: 0.88rem;
     background-color: var(--color-background);
     user-select: none;
     overflow-x: hidden;
-    * {
-        margin: 0;
-        padding: 0;
-        outline: 0;
-        appearance: none;
-        border: 0;
-        text-decoration: none;
-        list-style: none;
-        box-sizing: border-box;
-    }
+    
     
     a {
         color: var(--color-dark);
@@ -129,11 +120,38 @@
         width: 96%;
         margin: 0 auto;
         background-color: var(--color-background);
-        grid-template-columns: 14rem auto 23rem;
+        grid-template-columns: 14rem auto;
         max-width: 1920px;
 
         aside {
             height: 100vh;
+
+            * {
+                margin: 0;
+                padding: 0;
+                outline: 0;
+                appearance: none;
+                border: 0;
+                text-decoration: none;
+                list-style: none;
+                box-sizing: border-box;
+            }
+
+            .date {
+                display: inline-block;
+                background-color: var(--color-light);
+                border-radius: var(--border-radius-1);
+                margin-top: 1rem;
+                padding: 0.5rem 0 0.5rem 0;
+                width: 100%;
+                text-align: center;
+                
+                input[type="date"] {
+                    background-color: transparent;
+                    color: var(--color-dark);
+                    padding-left: 15px;
+                }
+            }
 
             .top {
                 display: flex;
@@ -226,21 +244,7 @@
         
         main {
             margin-top: 1.4rem;
-            padding: 2rem;
-
-            .date {
-                display: inline-block;
-                background-color: var(--color-light);
-                border-radius: var(--border-radius-1);
-                margin-top: 1rem;
-                padding: 0.5rem 0 0.5rem 0;
-                
-                input[type="date"] {
-                    background-color: transparent;
-                    color: var(--color-dark);
-                    padding-left: 15px;
-                }
-            }
+            padding: 1.1rem;
 
             a {
                 text-align: center;
@@ -249,91 +253,13 @@
                 color: var(--color-primary);
             }
 
+            .dashboard-title {
+                margin-top: 8px;
+            }
+
             h1 {
                 color: var(--color-dark);
             }
-
-            .table-container {
-                margin-top: 2rem;
-
-                h2 {
-                    margin-bottom: 0.8rem;
-                    font-weight: 700;
-                    color: var(--color-primary);
-                }
-
-                .data-table {
-                    background: var(--color-white);
-                    width: 100%;
-                    text-align: center;
-                    box-shadow: var(--box-shadow);
-                    transition: all 300ms ease;
-                    border: 1.5px solid #dddfe1;
-                    border-radius: 10px;
-                    border-collapse: separate!important;
-                    border-spacing: 0px;
-
-                    .text-left {
-                        text-align: left;
-                    }
-                    
-                    .text-center {
-                        text-align: center;
-                    }
-                    
-                    .text-right {
-                        text-align: right;
-                    }
-
-                    &:hover {
-                        box-shadow: none;
-                    }
-
-                    th {
-                        padding: var(--card-padding);
-                        color: var(--color-title-table);
-                        border-bottom: 1px solid var(--color-light);
-                        background-color: var(--background-title-table);
-                        text-transform: uppercase;
-                        font-weight: 500;
-
-                        &.top-left-radius {
-                            border-top-left-radius: 10px;
-                            border-left:#dddfe1;
-                        }
-
-                        &.top-right-radius {
-                            border-top-right-radius: 10px;
-                            border-right:#dddfe1;
-                        }
-                    }
-
-                    tbody {
-                        td {
-                            height: 2.8rem;
-                            border-bottom: 1px solid var(--color-light);
-                            color: var(--color-dark-variant);
-                            padding: 1.5rem;
-                        }
-
-                        tr {
-                            &:last-child {
-                                td {
-                                    border: none;
-                                }
-                            }
-                        }
-                    }
-
-                }
-                
-            }
-
-
-        }
-
-        .right {
-            margin-top: 1.4rem;
 
             .top {
                 display: flex;
@@ -405,6 +331,29 @@
                     height: 4rem;
                 }
             }
+
+            .table-title {
+                margin-bottom: 0.8rem;
+                font-weight: 700;
+                color: var(--color-primary);
+            }
+        }
+
+        .right {
+            margin-top: 1.4rem;
+
+            * {
+                margin: 0;
+                padding: 0;
+                outline: 0;
+                appearance: none;
+                border: 0;
+                text-decoration: none;
+                list-style: none;
+                box-sizing: border-box;
+            }
+
+            
 
             .recent-updates {
                 margin-right: 1rem;
@@ -487,106 +436,168 @@
 
 @media screen and (max-width: 1200px) {
     #dashboard {
+        
         .dashbard-container {
             width: 100%;
-            grid-template-columns: 1fr;
-        }
+            grid-template-columns: 100%;
 
-        aside {
-            position: fixed;
-            left:-100%;
-            background-color: var(--color-white);
-            width: 18rem;
-            z-index: 3;
-            box-shadow: 1rem 3rem 4rem var(--color-light);
-            height: 100%!important;
-            padding-right: var(--card-padding);
-            display: none;
-            animation: showMenu 400ms ease forwards;
-
-            @keyframes showMenu {
-                to {
-                    left:0;
+            aside {
+                position: fixed;
+                left:-100%;
+                background-color: var(--color-white);
+                width: 18rem;
+                z-index: 3;
+                box-shadow: 1rem 3rem 4rem var(--color-light);
+                height: 100%!important;
+                padding-right: var(--card-padding);
+                display: none;
+                animation: showMenu 400ms ease forwards;
+    
+                @keyframes showMenu {
+                    to {
+                        left:0;
+                    }
+                }
+    
+                .logo {
+                    h2 {
+                        display: inline;
+                    }
+                }
+    
+                .sidebar {
+                    h3 {
+                        display: inline;
+                    }
+    
+                    a {
+                        width: 100%;
+                        height: 3.4rem;
+                    }
+                }
+    
+                .close {
+                    display: inline-block;
+                    cursor: pointer;
                 }
             }
+    
+            main {
+                margin-top: 2.4rem;
+                padding: 1.1rem;
 
-            .logo {
-                h2 {
-                    display: inline;
+                .dashboard-title {
+                    font-size: 1.1rem;
+                    margin-top: 35px;
                 }
-            }
-
-            .sidebar {
-                h3 {
-                    display: inline;
-                }
-
-                a {
+    
+                .table-container {
+                    position: relative;
+                    margin: 0;
                     width: 100%;
-                    height: 3.4rem;
+                    padding: 0;
+                    table {
+                        width: 100%;
+                        margin: 0;
+                    }
                 }
-            }
-
-            .close {
-                display: inline-block;
-                cursor: pointer;
-            }
-        }
-
-        main {
-            .table-container {
-                position: relative;
-                margin: 3rem 0 0 0;
-                width: 100%;
-
-                table {
+    
+                .top {
+                    position:fixed;
+                    top: 0;
+                    left: 0;
+                    align-items: center;
+                    padding: 0 0.8rem;
+                    height: 4.6rem;
+                    background-color: var(--color-white);
                     width: 100%;
                     margin: 0;
+                    z-index: 2;
+                    box-shadow: 0 1rem 1rem var(--color-light);
+                    gap: 0.5rem;
+    
+                    .theme-toggler {
+                        margin-top: 0;
+                        height: 1.2rem;
+                        width: 3rem;
+                    }
+    
+                    button {
+                        display: inline-block!important;
+                        background-color: transparent;
+                        cursor: pointer;
+                        color: var(--color-dark);
+                        position: absolute;
+                        left: 1rem;
+    
+                        svg {
+                            font-size: 2rem;
+                        }
+                    }
                 }
-            }
-        }
-
-        .right {
-            width: 94%;
-            margin: 0 auto 4rem;
-
-            .top {
-                position:fixed;
-                top: 0;
-                left: 0;
-                align-items: center;
-                padding: 0 0.8rem;
-                height: 4.6rem;
-                background-color: var(--color-white);
-                width: 100%;
-                margin: 0;
-                z-index: 2;
-                box-shadow: 0 1rem 1rem var(--color-light);
-                gap: 1.2rem!important;
-
-                .theme-toggler {
-                    margin-top: 0;
-                }
-
-                button {
-                    display: inline-block!important;
-                    background-color: transparent;
-                    cursor: pointer;
-                    color: var(--color-dark);
-                    position: absolute;
-                    left: 1rem;
-
-                    svg {
-                        font-size: 2rem;
+    
+                .profile {
+                    align-items: center;
+                    .info {
+                        p {
+                            margin-bottom: 0.2rem;
+                        }
+                        
+                        .role {
+                            padding: 0.1rem 0.3rem;
+                            border-radius: 4px;
+                            font-size: 9px;
+                        }
+                    }
+    
+                    .profile-photo {
+                        width: 3rem;
+                        height: 3rem;
                     }
                 }
             }
-
-            .profile {
-                .info {
-                }
+    
+            .right {
+                width: 94%;
+                margin: 0 auto 4rem;
+    
+                
             }
         }
+    }
+}
+
+@media screen and (max-width: 424px) {
+    #dashboard {
+        .dashbard-container {
+            aside {
+            }
+    
+            main {
+                margin-top: 3rem;
+                padding: 1rem;
+                .top {
+                    .theme-toggler {
+                    }
+    
+                    button {
+    
+                        svg {
+                        }
+                    }
+                }
+    
+                .profile-photo {
+                    width: 2rem;
+                    height: 2rem;
+                }
+            }
+    
+            .right {
+            }
+        }
+
+        
 
     }
 }

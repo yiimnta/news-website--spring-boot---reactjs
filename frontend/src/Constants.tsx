@@ -23,6 +23,7 @@ export type User = {
   avatar: string;
   roles: Role[];
   status: string;
+  name?: string;
 };
 
 export type AuthUser = {

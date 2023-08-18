@@ -35,4 +35,9 @@ public class UserResponse {
     private List<RoleResponse> roles;
     private UserStatusEnum status;
     private int age;
+    private String name;
+
+    public String getName() {
+        return String.format("%s %s", firstname, lastname);
+    }
 }

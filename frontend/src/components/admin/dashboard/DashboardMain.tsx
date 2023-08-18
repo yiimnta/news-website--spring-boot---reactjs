@@ -1,14 +1,16 @@
 import { Outlet } from "react-router-dom";
-import { DashboardDate } from "./DashboardDate";
+import { DashboardHeader } from "./DashboardHeader";
 
 export const DashboardMain = () => {
   return (
-    <main>
-      <h1>Dashboard</h1>
-      <DashboardDate />
-      <div className="table-container">
-        <Outlet />
-      </div>
-    </main>
+    <>
+      <main>
+        <DashboardHeader />
+        <h1 className="dashboard-title">Dashboard</h1>
+        <div className="table-container">
+          <Outlet />
+        </div>
+      </main>
+    </>
   );
 };
