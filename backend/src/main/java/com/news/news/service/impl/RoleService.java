@@ -41,4 +41,8 @@ public class RoleService implements IRoleService, CRUDService<Role> {
     public Optional<Role> findByName(RoleEnum role) {
         return roleRepository.findByName(role.getName());
     }
+
+    public List<Role> findAllByIds(List<Long> ids) {
+        return roleRepository.findAllByIds(ids);
+    }
 }

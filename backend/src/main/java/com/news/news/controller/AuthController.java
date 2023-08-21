@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.news.news.dto.request.LoginDTO;
-import com.news.news.dto.request.UserDTO;
+import com.news.news.dto.request.AuthDTO;
 import com.news.news.dto.response.JwtAuthenticationResponse;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.exception.RefreshTokenException;
@@ -51,13 +51,13 @@ public class AuthController extends Controller {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<?> signup(@RequestBody @Valid UserDTO userDTO, HttpServletResponse response)
+    public ResponseEntity<?> signup(@RequestBody @Valid AuthDTO authDTO, HttpServletResponse response)
             throws Exception {
-        if (userService.existsByEmail(userDTO.getEmail())) {
+        if (userService.existsByEmail(authDTO.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("Email have already existed"), HttpStatus.CONFLICT);
         } else {
 
-            User newUser = userService.saveUserRequest(userDTO);
+            User newUser = userService.saveUserRequest(authDTO);
             Role memberRole = roleService.findByName(RoleEnum.MEMBER).orElse(null);
 
             if (memberRole == null) {

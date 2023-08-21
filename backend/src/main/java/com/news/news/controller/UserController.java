@@ -1,5 +1,7 @@
 package com.news.news.controller;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.news.news.dto.request.RoleUserDTO;
 import com.news.news.dto.request.UserDTO;
+import com.news.news.dto.request.AuthDTO;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.dto.response.UserResponse;
+import com.news.news.model.Role;
 import com.news.news.model.User;
+import com.news.news.service.impl.RoleService;
 import com.news.news.service.impl.UserService;
 
 import jakarta.validation.Valid;
@@ -29,13 +33,21 @@ public class UserController extends Controller {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> signup(@RequestBody @Valid RoleUserDTO userDTO) {
+    @Autowired
+    private RoleService roleService;
+
+    @PostMapping
+    public ResponseEntity<?> signup(@RequestBody @Valid UserDTO userDTO) {
         if (userService.existsByEmail(userDTO.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("Email have already existed"), HttpStatus.CONFLICT);
         } else {
-            User newUser = userService.saveUserRequest(userDTO);
+            List<Role> roles = new ArrayList<>();
 
+            if (!userDTO.getRoles().isEmpty()) {
+                roles = roleService.findAllByIds(userDTO.getRoles());
+            }
+
+            User newUser = userService.saveUserRequest(userDTO, new HashSet<>(roles));
             return new ResponseEntity<>(new UserResponse(newUser), HttpStatus.CREATED);
         }
     }
@@ -70,7 +82,7 @@ public class UserController extends Controller {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody AuthDTO userDTO) {
 
         User updatedUser = userService.updateUser(id, userDTO);
 

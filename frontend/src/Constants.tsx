@@ -8,6 +8,18 @@ export const ROLES: IROLES = {
   ROLE_ADMIN: "ADMIN",
 };
 
+export const USER_STATUS = {
+  ACTIVE: 0, // active
+  INACTIVE: 1, // inactive when the user has't actived their email yet
+  BLOCK: 2,
+};
+
+export const USER_GENDER = {
+  MALE: "M",
+  FEMALE: "F",
+  NEUTRAL: "N",
+};
+
 export type Role = {
   id?: number;
   name: string;
@@ -22,7 +34,8 @@ export type User = {
   email: string;
   avatar: string;
   roles: Role[];
-  status: string;
+  status: number;
+  gender: string;
   name?: string;
 };
 

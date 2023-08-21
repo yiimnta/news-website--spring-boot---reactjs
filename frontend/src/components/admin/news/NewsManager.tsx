@@ -6,13 +6,33 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import "./NewsManager.scss";
-import { ROLES, Role, User } from "../../../Constants";
+import {
+  ROLES,
+  Role,
+  USER_GENDER,
+  USER_STATUS,
+  User,
+} from "../../../Constants";
 import { usePrivateAxios } from "../../../hooks/usePrivateAxios";
 import { Toolbar } from "primereact/toolbar";
-import { FileUpload } from "primereact/fileupload";
-import { Dialog } from "primereact/dialog";
 import { NewsDetailsDialog } from "./NewsDetailsDialog";
 import { NewsConfirmDialog } from "./NewsConfirmDialog";
+import { useFirebase } from "../../../hooks/useFirebase";
+import { error } from "console";
+
+type UserData = {
+  id: number | null;
+  roles: number[];
+  avatarFile?: HTMLInputElement | null;
+  firstname: string;
+  lastname: string;
+  age: number;
+  email: string;
+  avatar: string;
+  status: number;
+  gender: string;
+  password: string;
+};
 
 export default function NewsManager() {
   let emptyUser: User = {
@@ -23,6 +43,8 @@ export default function NewsManager() {
       "https://firebasestorage.googleapis.com/v0/b/news-ae8fb.appspot.com/o/default-avatar.jpg?alt=media&token=272fa245-a638-4896-8d74-a6d2b44256cb",
     name: "",
     roles: [],
+    status: USER_STATUS.INACTIVE,
+    gender: USER_GENDER.FEMALE,
   };
 
   FilterService.register("roleFilter", (roles: Role[], selectedRole) => {
@@ -35,15 +57,12 @@ export default function NewsManager() {
   const [submitted, setSubmitted] = useState(false);
   const [userDialog, setUserDialog] = useState(false);
   const [user, setUser] = useState<User>(emptyUser);
-
   const privateAxios = usePrivateAxios();
   const [users, setUsers] = useState<User[]>();
   const [selectedUsers, setSelectedUsers] = useState<User[]>();
-  const [roles, setRoles] = useState<Role[]>();
-
+  const [roles, setRoles] = useState<Role[]>([]);
   const [deleteUserDialog, setDeleteUserDialog] = useState(false);
   const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
-
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -117,6 +136,41 @@ export default function NewsManager() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const { uploadIMG } = useFirebase();
+
+  const saveUser = (data: UserData) => {
+    if (data == null) {
+      console.error("Data is null. Could not save data.");
+      return;
+    }
+
+    if (data.avatarFile) {
+      uploadIMG(data.avatarFile)
+        ?.then((imgURL) => {
+          data.avatar = imgURL as string;
+          delete data.avatarFile;
+          privateAxios
+            .post("/users", data)
+            .then((msg) => {
+              console.log(msg);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      delete data.avatarFile;
+      privateAxios.post("/users", data);
+    }
+  };
+
+  const deleteUser = () => {
+    console.log("delete");
+  };
+
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     const _filters = { ...filters };
@@ -124,22 +178,6 @@ export default function NewsManager() {
 
     setFilters(_filters);
     setGlobalFilterValue(value);
-  };
-
-  const renderHeader = () => {
-    return (
-      <div className="flex justify-content-between align-items-center">
-        <h2 className="table-title">User Management</h2>
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue}
-            onChange={onGlobalFilterChange}
-            placeholder="Name, email, age"
-          />
-        </span>
-      </div>
-    );
   };
 
   const openNew = () => {
@@ -161,10 +199,6 @@ export default function NewsManager() {
     setDeleteUserDialog(true);
   };
 
-  const deleteUser = () => {
-    console.log("delete");
-  };
-
   const confirmDeleteSelected = () => {
     setDeleteUsersDialog(true);
   };
@@ -173,7 +207,21 @@ export default function NewsManager() {
     console.log("delete n users");
   };
 
-  const header = renderHeader();
+  const header = () => {
+    return (
+      <div className="flex justify-content-between align-items-center">
+        <h2 className="table-title">User Management</h2>
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChange}
+            placeholder="id, name, email, age"
+          />
+        </span>
+      </div>
+    );
+  };
 
   const bodyTemplate = {
     name: (rowData: User) => {
@@ -212,19 +260,16 @@ export default function NewsManager() {
     role: (rowData: User) => {
       return (
         <div className="role-list">
-          {rowData.roles.map((e, index) => {
+          {rowData.roles.map((e) => {
             if (ROLES[e.name]) {
               return (
-                <>
-                  <span className="role" key={index}>
-                    <span
-                      className="circle"
-                      style={{ background: `${e.color}` }}
-                    ></span>{" "}
-                    {ROLES[e.name]}
-                  </span>
-                  <br />
-                </>
+                <span className="role" key={e.id}>
+                  <span
+                    className="circle"
+                    style={{ background: `${e.color}` }}
+                  ></span>{" "}
+                  {ROLES[e.name]}
+                </span>
               );
             }
             return "";
@@ -236,10 +281,10 @@ export default function NewsManager() {
 
   const itemTemplate = {
     status: (option) => {
-      return <span>{option}</span>;
+      return <span key={option.id}>{option}</span>;
     },
     role: (option) => {
-      return <span>{ROLES[option.name]}</span>;
+      return <span key={option.id}>{ROLES[option.name]}</span>;
     },
   };
 
@@ -270,10 +315,6 @@ export default function NewsManager() {
         />
       );
     },
-  };
-
-  const saveUser = () => {
-    console.log("save user");
   };
 
   const deleteUserDialogFooter = (
@@ -405,8 +446,6 @@ export default function NewsManager() {
           />
           <Column
             header="Roles"
-            sortable
-            sortField="roles.name"
             filterField="roles"
             filterMenuStyle={{ width: "14rem" }}
             body={bodyTemplate.role}
@@ -438,6 +477,7 @@ export default function NewsManager() {
         saveUser={saveUser}
         userDialog={userDialog}
         user={user}
+        roles={roles}
       />
 
       <NewsConfirmDialog

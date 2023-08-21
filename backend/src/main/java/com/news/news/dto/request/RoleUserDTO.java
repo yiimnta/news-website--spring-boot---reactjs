@@ -2,7 +2,7 @@ package com.news.news.dto.request;
 
 import java.util.Set;
 
-public class RoleUserDTO extends UserDTO {
+public class RoleUserDTO extends AuthDTO {
 
     private Set<String> roles;
 
