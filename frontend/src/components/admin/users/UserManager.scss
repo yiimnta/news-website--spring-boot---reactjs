@@ -27,6 +27,30 @@
 
 #user-management {
 
+    .status {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: 500;
+
+        &.status-block {
+            color:black;
+            background: #ff8484;
+        }
+
+        &.status-active {
+            color:white;
+            background: #1aaf5d;
+        }
+
+        &.status-inactive {
+            color: white;
+            background: #afa51a;
+        }
+    }
+   
+
+    
+
     .p-paginator {
         .p-paginator-current  {
             margin-left: auto;
@@ -104,6 +128,8 @@
 #user-details-dialog-avatar {
     display: block;
     margin: 0 auto;
+    margin-bottom: 12px;
+    
     .outer {
         width: 100% !important;
         height: 100% !important;

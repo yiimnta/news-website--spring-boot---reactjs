@@ -55,7 +55,7 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
     public User(String firstname, String lastname, String email, String avatar, int age, Gender gender,
-            String password) {
+            String password, int status) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
@@ -63,7 +63,12 @@ public class User implements UserDetails {
         this.age = age;
         this.gender = gender;
         this.password = password;
-        this.status = UserStatusEnum.ACTIVE;
+        this.status = UserStatusEnum.getStatusByNumber(status);
+    }
+
+    public User(String firstname, String lastname, String email, String avatar, int age, Gender gender,
+            String password, UserStatusEnum status) {
+        this(firstname, lastname, email, avatar, age, gender, password, status.getValue());
     }
 
     @Override

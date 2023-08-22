@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.news.news.dto.request.UserDTO;
-import com.news.news.dto.request.AuthDTO;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.dto.response.UserResponse;
 import com.news.news.model.Role;
@@ -82,7 +81,7 @@ public class UserController extends Controller {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody AuthDTO userDTO) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
 
         User updatedUser = userService.updateUser(id, userDTO);
 

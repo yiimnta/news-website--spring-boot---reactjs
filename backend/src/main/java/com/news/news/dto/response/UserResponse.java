@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 
+import com.news.news.model.Gender;
 import com.news.news.model.User;
-import com.news.news.model.UserStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +25,8 @@ public class UserResponse {
         user.getRoles().stream().forEach(role -> {
             roles.add(new RoleResponse(role));
         });
+
+        this.status = user.getStatus().getValue();
     }
 
     private long id;
@@ -33,9 +35,9 @@ public class UserResponse {
     private String email;
     private String avatar;
     private List<RoleResponse> roles;
-    private UserStatusEnum status;
+    private int status;
     private int age;
-    private String name;
+    private Gender gender;
 
     public String getName() {
         return String.format("%s %s", firstname, lastname);

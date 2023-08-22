@@ -47,3 +47,6 @@ export type AuthUser = {
   accessToken: string;
   avatar: string;
 };
+
+export const DEFAULT_USER_AVATAR =
+  "https://firebasestorage.googleapis.com/v0/b/news-ae8fb.appspot.com/o/default-avatar.jpg?alt=media&token=272fa245-a638-4896-8d74-a6d2b44256cb";

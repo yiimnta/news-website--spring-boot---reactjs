@@ -1,6 +1,6 @@
 import { Dialog } from "primereact/dialog";
 
-export const NewsConfirmDialog = (props: {
+export const UserConfirmDialog = (props: {
   children: React.ReactNode;
   visible: boolean;
   footer: React.ReactNode;

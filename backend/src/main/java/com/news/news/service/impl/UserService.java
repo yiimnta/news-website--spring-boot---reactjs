@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import io.micrometer.common.util.StringUtils;
 
-import com.news.news.dto.request.AuthDTO;
+import com.news.news.dto.request.UserDTO;
 import com.news.news.model.Role;
 import com.news.news.model.User;
 import com.news.news.repository.UserRepository;
@@ -34,7 +34,7 @@ public class UserService implements IUserService, CRUDService<User> {
     @Value("${user.default.avatar.link}")
     private String defaultAvatarLink;
 
-    public User saveUserRequest(AuthDTO userRequest) {
+    public User saveUserRequest(UserDTO userRequest, Set<Role> roles) {
 
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
 
@@ -43,28 +43,15 @@ public class UserService implements IUserService, CRUDService<User> {
         }
 
         User newUser = new User(userRequest.getFirstname(), userRequest.getLastname(), userRequest.getEmail(),
-                userRequest.getAvatar(), userRequest.getAge(), userRequest.getGender(), hashedPassword);
-
-        return save(newUser);
-    }
-
-    public User saveUserRequest(AuthDTO userRequest, Set<Role> roles) {
-
-        String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
-
-        if (StringUtils.isEmpty(userRequest.getAvatar())) {
-            userRequest.setAvatar(defaultAvatarLink);
-        }
-
-        User newUser = new User(userRequest.getFirstname(), userRequest.getLastname(), userRequest.getEmail(),
-                userRequest.getAvatar(), userRequest.getAge(), userRequest.getGender(), hashedPassword);
+                userRequest.getAvatar(), userRequest.getAge(), userRequest.getGender(), hashedPassword,
+                userRequest.getStatus());
 
         newUser.setRoles(roles);
 
         return save(newUser);
     }
 
-    public User updateUser(Long id, AuthDTO userRequest) {
+    public User updateUser(Long id, UserDTO userRequest) {
 
         User user = userRepository.findById(id).orElse(null);
 

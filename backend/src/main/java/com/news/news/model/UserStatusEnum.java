@@ -15,4 +15,8 @@ public enum UserStatusEnum {
         this.value = value;
     }
 
+    public static UserStatusEnum getStatusByNumber(int value) {
+        return value == UserStatusEnum.ACTIVE.getValue() ? UserStatusEnum.ACTIVE
+                : (value == UserStatusEnum.INACTIVE.getValue() ? UserStatusEnum.INACTIVE : UserStatusEnum.BLOCK);
+    }
 }

@@ -3,18 +3,19 @@ import "react-toastify/dist/ReactToastify.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
 import "primeicons/primeicons.css"; //icons
+import "react-toastify/dist/ReactToastify.css";
 
 import Login from "./components/login/Login";
-import { ToastContainer } from "react-toastify";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./components/public/HomePage";
 import NotFound from "./NotFound";
-import UserManager from "./components/admin/users/UserManager";
+import NewsManager from "./components/admin/news/NewsManager";
 import RequireAuth from "./components/RequireAuth";
 import { DashboardPage } from "./components/admin/dashboard/DashboardPage";
 import { PersistLogin } from "./components/PersistLogin";
-import NewsManager from "./components/admin/news/NewsManager";
+import UserManager from "./components/admin/users/UserManager";
 import { ROLES } from "./Constants";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (

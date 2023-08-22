@@ -1,5 +1,8 @@
 package com.news.news.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import com.news.news.model.RefreshToken;
 import com.news.news.model.Role;
 import com.news.news.model.RoleEnum;
 import com.news.news.model.User;
+import com.news.news.service.impl.AuthService;
 import com.news.news.service.impl.JWTService;
 import com.news.news.service.impl.RefreshTokenService;
 import com.news.news.service.impl.RoleService;
@@ -34,6 +38,9 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 public class AuthController extends Controller {
+
+    @Autowired
+    private AuthService authService;
 
     @Autowired
     private UserService userService;
@@ -57,15 +64,15 @@ public class AuthController extends Controller {
             return new ResponseEntity<>(new ResponseMessage("Email have already existed"), HttpStatus.CONFLICT);
         } else {
 
-            User newUser = userService.saveUserRequest(authDTO);
             Role memberRole = roleService.findByName(RoleEnum.MEMBER).orElse(null);
 
             if (memberRole == null) {
                 throw new Exception("Can not find Member role!");
-            } else {
-                newUser.addRole(memberRole);
-                userService.save(newUser);
             }
+
+            Set<Role> roles = new HashSet<>();
+            roles.add(memberRole);
+            User newUser = authService.register(authDTO, roles);
 
             String jwt = jwtService.generateToken(newUser);
             JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(newUser);

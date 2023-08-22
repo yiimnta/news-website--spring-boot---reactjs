@@ -3,6 +3,7 @@ import {
   getDownloadURL,
   ref as storageRef,
   uploadBytes,
+  deleteObject,
 } from "firebase/storage";
 
 import { v4 as uuidv4 } from "uuid";
@@ -33,5 +34,28 @@ export const useFirebase = () => {
         });
     });
   };
-  return { uploadIMG };
+
+  const deleteIMG = (imgURL: string) => {
+    const urlPattern =
+      /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+
+    if (!urlPattern.test(imgURL)) {
+      console.error(`${imgURL} is not a link`);
+      return null;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const imageRef = storageRef(fb.storage, imgURL);
+
+      deleteObject(imageRef)
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          console.error(error);
+          reject(error);
+        });
+    });
+  };
+  return { uploadIMG, deleteIMG };
 };
