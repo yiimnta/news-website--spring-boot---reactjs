@@ -30,9 +30,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import useAuth from "../../../hooks/useAuth";
 
 export type UserData = {
-  id?: number | null;
+  id?: number | undefined;
   roles: number[];
-  avatarFile?: HTMLInputElement | null;
+  avatarFile?: HTMLInputElement | undefined;
   firstname: string;
   lastname: string;
   age: number;
@@ -49,6 +49,7 @@ type userDetailFormRef = {
 
 export default function UserManager() {
   const emptyUser: User = {
+    id: undefined,
     firstname: "",
     lastname: "",
     email: "",
@@ -432,7 +433,7 @@ export default function UserManager() {
     action: (rowData: User) => {
       return (
         <div style={{ display: "flex", gap: "6px" }}>
-          <Button style={{ padding: "6px" }}>
+          <Button style={{ padding: "6px" }} onClick={() => editUser(rowData)}>
             <EditIcon />
           </Button>
 
@@ -565,10 +566,10 @@ export default function UserManager() {
     </>
   );
 
-  // const editUser = (user: User) => {
-  //   setUser({ ...user });
-  //   setUserDialog(true);
-  // };
+  const editUser = (data: User) => {
+    setUser({ ...data });
+    setUserDialog(true);
+  };
 
   return (
     <div id="user-management">

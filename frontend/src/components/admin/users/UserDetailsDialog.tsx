@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import {
@@ -21,8 +22,12 @@ import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import { UserData } from "./UserManager";
 import { Role, User } from "../../../Define";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckIcon from "@mui/icons-material/Check";
 
 type FormValue = {
+  id: number | undefined;
   firstname: string;
   lastname: string;
   age: number;
@@ -35,6 +40,7 @@ type FormValue = {
 };
 
 const formEmpty: FormValue = {
+  id: undefined,
   firstname: "",
   lastname: "",
   email: "",
@@ -58,7 +64,7 @@ export const UserDetailsDialog = forwardRef(
     ref
   ) => {
     const { user, userDialog, roles, hideDialog, saveUser } = props;
-    const [avatar, setAvatar] = useState<string>(user.avatar);
+    const [avatar, setAvatar] = useState<string>(DEFAULT_USER_AVATAR);
     const [avatarFile, setAvatarFile] = useState<HTMLInputElement | null>(null);
     const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
     const [rolesErrorMessage, setRolesErrorMessage] = useState<string>("");
@@ -71,7 +77,7 @@ export const UserDetailsDialog = forwardRef(
     const { errors } = formState;
     useImperativeHandle(ref, () => {
       return {
-        resetForm: () => resetAllFields(),
+        resetForm: () => clearAllFields(),
       };
     });
 
@@ -107,32 +113,38 @@ export const UserDetailsDialog = forwardRef(
       return ROLES[option.name];
     };
 
+    const handleResetClick = () => {
+      reset();
+    };
+
     const handleCancelClick = () => {
-      resetAllFields();
+      clearAllFields();
       hideDialog();
     };
 
-    const resetAllFields = () => {
+    const clearAllFields = () => {
       setSelectedRoles([]);
       setRolesErrorMessage("");
-      reset();
+      setAvatar(DEFAULT_USER_AVATAR);
+      reset(formEmpty);
       setAvatarFile(null);
     };
 
     const userDialogFooter = (
       <>
+        <Button icon="pi" className="p-button-text" onClick={handleCancelClick}>
+          <CloseIcon /> <b>Cancel</b>
+        </Button>
+        <Button icon="pi" className="p-button-text" onClick={handleResetClick}>
+          <RestartAltIcon /> <b>Reset</b>
+        </Button>
         <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-text"
-          onClick={handleCancelClick}
-        />
-        <Button
-          label="Save"
-          icon="pi pi-check"
+          icon="pi"
           className="p-button-text"
           onClick={handleSubmit(onSubmitForm)}
-        />
+        >
+          <CheckIcon /> <b>Save</b>
+        </Button>
       </>
     );
 
@@ -149,11 +161,23 @@ export const UserDetailsDialog = forwardRef(
       setAvatar(newAvatar);
     };
 
+    useEffect(() => {
+      let formValues = { ...formEmpty };
+
+      if (user.id) {
+        Object.assign(formValues, user);
+        setSelectedRoles(user.roles);
+        setAvatar(user.avatar);
+      }
+
+      reset(formValues);
+    }, [user]);
+
     return (
       <Dialog
         visible={userDialog}
         style={{ width: "600px" }}
-        header="User Details"
+        header={`User Details${user.id ? `( ID: ${user.id})` : ""}`}
         modal
         className="p-fluid"
         footer={userDialogFooter}
