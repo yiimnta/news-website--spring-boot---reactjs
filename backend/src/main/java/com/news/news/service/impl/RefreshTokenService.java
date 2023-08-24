@@ -155,4 +155,8 @@ public class RefreshTokenService implements IRefreshTokenService, CRUDService<Re
         response.addCookie(rememberMeCookie);
     }
 
+    @Override
+    public void deleteByIdIn(List<Long> ids) {
+        refreshTokenRepository.deleteByIdIn(ids);
+    }
 }

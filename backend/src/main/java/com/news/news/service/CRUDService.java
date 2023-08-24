@@ -12,4 +12,6 @@ public interface CRUDService<T> {
     T save(T t);
 
     void delete(long id);
+
+    void deleteByIdIn(List<Long> ids);
 }

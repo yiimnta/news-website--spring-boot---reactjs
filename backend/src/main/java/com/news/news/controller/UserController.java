@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.news.news.dto.request.DeleteIdsDTO;
 import com.news.news.dto.request.UserDTO;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.dto.response.UserResponse;
@@ -67,17 +68,18 @@ public class UserController extends Controller {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deleteUsers(@PathVariable("id") Long id) {
+    @DeleteMapping()
+    public ResponseEntity<Long> deleteUsers(@RequestBody @Valid DeleteIdsDTO deleteIdsDTO) {
 
-        if (userService.exists(id)) {
-            userService.delete(id);
-
-            return ResponseEntity.ok().build();
-
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            if (!deleteIdsDTO.getIds().isEmpty()) {
+                userService.deleteByIdIn(deleteIdsDTO.getIds());
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")

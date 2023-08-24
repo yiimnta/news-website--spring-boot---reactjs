@@ -3,10 +3,8 @@ import { Dialog } from "primereact/dialog";
 import {
   DEFAULT_USER_AVATAR,
   ROLES,
-  Role,
   USER_GENDER,
   USER_STATUS,
-  User,
 } from "../../../Constants";
 import { useForm } from "react-hook-form";
 import { MultiSelect } from "primereact/multiselect";
@@ -22,6 +20,7 @@ import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import { UserData } from "./UserManager";
+import { Role, User } from "../../../Define";
 
 type FormValue = {
   firstname: string;
@@ -64,7 +63,7 @@ export const UserDetailsDialog = forwardRef(
     const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
     const [rolesErrorMessage, setRolesErrorMessage] = useState<string>("");
     const avatarRef = useRef(null);
-    const { register, setValue, handleSubmit, formState, reset, watch } =
+    const { register, handleSubmit, formState, reset, watch } =
       useForm<FormValue>({
         defaultValues: formEmpty,
       });

@@ -45,4 +45,9 @@ public class RoleService implements IRoleService, CRUDService<Role> {
     public List<Role> findAllByIds(List<Long> ids) {
         return roleRepository.findAllByIds(ids);
     }
+
+    @Override
+    public void deleteByIdIn(List<Long> ids) {
+        roleRepository.deleteByIdIn(ids);
+    }
 }

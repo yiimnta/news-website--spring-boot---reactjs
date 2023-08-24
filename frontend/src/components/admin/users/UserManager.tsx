@@ -9,10 +9,8 @@ import "./UserManager.scss";
 import {
   DEFAULT_USER_AVATAR,
   ROLES,
-  Role,
   USER_GENDER,
   USER_STATUS,
-  User,
 } from "../../../Constants";
 import { usePrivateAxios } from "../../../hooks/usePrivateAxios";
 import { Toolbar } from "primereact/toolbar";
@@ -20,12 +18,16 @@ import { UserDetailsDialog } from "./UserDetailsDialog";
 import { UserConfirmDialog } from "./UserConfirmDialog";
 import { useFirebase } from "../../../hooks/useFirebase";
 import { useToastify } from "../../../hooks/useToastify";
+import { MultiSelect } from "primereact/multiselect";
+import { StringUtils } from "../../../Utils";
+import { DeleteIds, Role, User } from "../../../Define";
+
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import EditIcon from "@mui/icons-material/Edit";
-import { MultiSelect } from "primereact/multiselect";
-import { StringUtils } from "../../../Utils";
+import DeleteIcon from "@mui/icons-material/Delete";
+import useAuth from "../../../hooks/useAuth";
 
 export type UserData = {
   id?: number | null;
@@ -64,13 +66,14 @@ export default function UserManager() {
 
   const matchModes = [{ label: "Role Filter", value: "roleFilter" }];
 
+  const { auth } = useAuth();
   const toastify = useToastify();
   const [submitted, setSubmitted] = useState(false);
   const [userDialog, setUserDialog] = useState(false);
   const [user, setUser] = useState<User>(emptyUser);
   const privateAxios = usePrivateAxios();
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<User[]>();
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [deleteUserDialog, setDeleteUserDialog] = useState(false);
   const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
@@ -257,10 +260,6 @@ export default function UserManager() {
     }
   };
 
-  const deleteUser = () => {
-    console.log("delete");
-  };
-
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     const _filters = { ...filters };
@@ -284,17 +283,62 @@ export default function UserManager() {
     setDeleteUsersDialog(false);
   };
 
-  // const confirmDeleteUser = (user) => {
-  //   setUser(user);
-  //   setDeleteUserDialog(true);
-  // };
+  const confirmDeleteUser = (user: User) => {
+    setUser(user);
+    setDeleteUserDialog(true);
+  };
+
+  const deleteUser = () => {
+    if (user.id && user.id !== auth.id) {
+      const data: DeleteIds = { ids: [user.id] };
+      privateAxios
+        .delete("/users", { data })
+        .then(() => {
+          toastify.success(`User ${user.id} has been deleted`);
+          const newUsers = [...users].filter((u) => u.id != user.id);
+          setUsers(newUsers);
+          setUser(emptyUser);
+        })
+        .catch((error) => {
+          console.log(error);
+          toastify.error(`Can not delete User ${user.id}`);
+        });
+    }
+
+    hideDeleteUserDialog();
+  };
 
   const confirmDeleteSelected = () => {
     setDeleteUsersDialog(true);
   };
 
   const deleteSelectedUsers = () => {
-    console.log("delete n users");
+    if (selectedUsers.length > 0) {
+      const data = {
+        ids: selectedUsers.map((u) => {
+          if (u.id && u.id !== auth.id) {
+            return u.id;
+          }
+        }),
+      };
+      if (data.ids.every((e) => e)) {
+        privateAxios
+          .delete("/users", { data })
+          .then(() => {
+            toastify.success(`Users have been deleted`);
+            const newUsers = [...users].filter((u) => !data.ids.includes(u.id));
+            setUsers(newUsers);
+          })
+          .catch((error) => {
+            console.log(error);
+            toastify.error(`Can not delete Users`);
+          });
+      } else {
+        toastify.error(`Can not delete selected users`);
+      }
+    }
+
+    hideDeleteUsersDialog();
   };
 
   const hideDialog = () => {
@@ -353,7 +397,12 @@ export default function UserManager() {
           </div>
           <div>
             <p>
-              <b>{rowData.name}</b>
+              <b>
+                {rowData.name}{" "}
+                {rowData.id === auth.id && (
+                  <span style={{ color: "#ff000a" }}>(You)</span>
+                )}
+              </b>
             </p>
           </div>
         </div>
@@ -380,11 +429,23 @@ export default function UserManager() {
       );
     },
 
-    action: () => {
+    action: (rowData: User) => {
       return (
-        <Button style={{ padding: "6px" }}>
-          <EditIcon />
-        </Button>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <Button style={{ padding: "6px" }}>
+            <EditIcon />
+          </Button>
+
+          {auth.id !== rowData.id && (
+            <Button
+              className="p-button p-button-warning"
+              style={{ padding: "6px" }}
+              onClick={() => confirmDeleteUser(rowData)}
+            >
+              <DeleteIcon />
+            </Button>
+          )}
+        </div>
       );
     },
 
@@ -486,6 +547,7 @@ export default function UserManager() {
       />
     </>
   );
+
   const deleteUsersDialogFooter = (
     <>
       <Button
@@ -524,12 +586,19 @@ export default function UserManager() {
           rowHover
           selection={selectedUsers}
           onSelectionChange={(e) => setSelectedUsers(e.value)}
+          showSelectionElement={(e) => {
+            if (e.id === auth.id) {
+              return null;
+            }
+            return e;
+          }}
           filters={filters}
           filterDisplay="menu"
           loading={loading}
           globalFilterFields={["id", "name", "email", "age"]}
           emptyMessage="No users found."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+          dragSelection
         >
           <Column
             selectionMode="multiple"
@@ -604,7 +673,7 @@ export default function UserManager() {
             headerStyle={{ width: "5rem", textAlign: "center" }}
           />
           <Column
-            headerStyle={{ width: "3rem", textAlign: "center" }}
+            headerStyle={{ width: "4rem", textAlign: "center" }}
             bodyStyle={{ textAlign: "center", overflow: "visible" }}
             body={bodyTemplate.action}
           />
@@ -621,7 +690,7 @@ export default function UserManager() {
       />
 
       <UserConfirmDialog
-        visible={deleteUserDialog}
+        visible={deleteUserDialog && user.id !== auth.id}
         footer={deleteUserDialogFooter}
         onHide={hideDeleteUserDialog}
       >
@@ -632,7 +701,8 @@ export default function UserManager() {
           />
           {user && (
             <span>
-              Are you sure you want to delete user <b>{user.name}</b>?
+              Are you sure you want to delete user{" "}
+              <b>{`${user.name}[${user.id}]`}</b>?
             </span>
           )}
         </div>

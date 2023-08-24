@@ -8,7 +8,7 @@ import { AxiosError } from "axios";
 import axios from "axios";
 import useAuth from "../../hooks/useAuth";
 import { HTTPSTATUS_CODES } from "../../hooks/usePrivateAxios";
-import { AuthUser } from "../../Constants";
+import { AuthUser } from "../../Define";
 
 type FormValues = {
   email: string;

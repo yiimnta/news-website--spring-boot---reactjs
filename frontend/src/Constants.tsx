@@ -1,6 +1,4 @@
-export interface IROLES {
-  [key: string]: string;
-}
+import { IROLES } from "./Define";
 
 export const ROLES: IROLES = {
   ROLE_MOD: "MOD",
@@ -18,34 +16,6 @@ export const USER_GENDER = {
   MALE: "M",
   FEMALE: "F",
   NEUTRAL: "N",
-};
-
-export type Role = {
-  id?: number;
-  name: string;
-  color: string;
-};
-
-export type User = {
-  id?: string;
-  firstname: string;
-  lastname: string;
-  age: number;
-  email: string;
-  avatar: string;
-  roles: Role[];
-  status: number;
-  gender: string;
-  name?: string;
-};
-
-export type AuthUser = {
-  firstname: string;
-  lastname: string;
-  email: string;
-  roles: Role[];
-  accessToken: string;
-  avatar: string;
 };
 
 export const DEFAULT_USER_AVATAR =

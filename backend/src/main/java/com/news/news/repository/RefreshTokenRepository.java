@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import com.news.news.model.RefreshToken;
 import com.news.news.model.User;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long>, GeneralRepository {
 
     Optional<RefreshToken> findByToken(String token);
 

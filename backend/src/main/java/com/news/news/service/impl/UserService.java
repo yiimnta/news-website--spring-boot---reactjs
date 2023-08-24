@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import io.micrometer.common.util.StringUtils;
+import jakarta.transaction.Transactional;
 
 import com.news.news.dto.request.UserDTO;
 import com.news.news.model.Role;
@@ -106,5 +107,11 @@ public class UserService implements IUserService, CRUDService<User> {
     @Override
     public void delete(long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByIdIn(List<Long> ids) {
+        this.userRepository.deleteByIdIn(ids);
     }
 }

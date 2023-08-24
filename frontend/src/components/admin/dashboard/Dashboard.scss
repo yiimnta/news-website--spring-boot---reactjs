@@ -309,7 +309,9 @@
 
                 .info {
                     margin-top: 0.5rem;
-
+                    p {
+                        margin-bottom: 5px;
+                    }
                     .role {
                         background: #f2fffd;
                         padding: 0.1rem 0.4rem;

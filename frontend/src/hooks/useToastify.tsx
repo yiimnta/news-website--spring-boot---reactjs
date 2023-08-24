@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 export const useToastify = () => {
   const config = {
     position: "top-right",
-    autoClose: 1200,
+    autoClose: 2200,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,
