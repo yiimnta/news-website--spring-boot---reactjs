@@ -55,6 +55,9 @@ public class SecurityConfigurer {
         http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         request -> request.requestMatchers("/public/**", "/auth/**", "/login").permitAll()
+                                .requestMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN")
+                                .requestMatchers("/newstype/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MOD")
+                                .requestMatchers("/news/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MOD")
                                 .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
