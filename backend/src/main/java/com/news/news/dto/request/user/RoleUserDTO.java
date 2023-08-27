@@ -1,6 +1,8 @@
-package com.news.news.dto.request;
+package com.news.news.dto.request.user;
 
 import java.util.Set;
+
+import com.news.news.dto.request.auth.AuthDTO;
 
 public class RoleUserDTO extends AuthDTO {
 

@@ -16,6 +16,8 @@ import { PersistLogin } from "./components/PersistLogin";
 import UserManager from "./components/admin/users/UserManager";
 import { ROLES } from "./Constants";
 import { ToastContainer } from "react-toastify";
+import { Greeting } from "./components/admin/greeting/Greeting";
+import { Settings } from "./components/admin/settings/Settings";
 
 function App() {
   return (
@@ -27,8 +29,10 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]} />}>
             <Route element={<DashboardPage />}>
+              <Route path="/admin/" element={<Greeting />} />
               <Route path="/admin/news" element={<NewsManager />} />
               <Route path="/admin/users" element={<UserManager />} />
+              <Route path="/admin/settings" element={<Settings />} />
             </Route>
           </Route>
         </Route>

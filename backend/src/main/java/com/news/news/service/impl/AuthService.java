@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import io.micrometer.common.util.StringUtils;
 
-import com.news.news.dto.request.AuthDTO;
+import com.news.news.dto.request.auth.AuthDTO;
 import com.news.news.model.Role;
 import com.news.news.model.User;
 import com.news.news.model.UserStatusEnum;

@@ -9,10 +9,43 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useContext } from "react";
 import { DashboardContext } from "../../../contexts/DashboardProvider";
 import { DashboardDate } from "./DashboardDate";
+import { usePrivateAxios } from "../../../hooks/usePrivateAxios";
+import { useToastify } from "../../../hooks/useToastify";
+import { NavLink } from "react-router-dom";
+
+type NavObject = {
+  url: string;
+  name: string;
+  icon: React.ReactNode;
+};
+const navList: NavObject[] = [
+  {
+    url: "/admin/",
+    name: "Dashboard",
+    icon: <GridViewSharpIcon />,
+  },
+  {
+    url: "/admin/users",
+    name: "Users",
+    icon: <Person4SharpIcon />,
+  },
+  {
+    url: "/admin/news",
+    name: "News",
+    icon: <NewspaperIcon />,
+  },
+  {
+    url: "/admin/settings",
+    name: "Settings",
+    icon: <SettingsIcon />,
+  },
+];
 
 export const Aside = () => {
   const { show, setShow } = useContext(DashboardContext);
   const [showXButton, setShowXButton] = useState(false);
+  const privateAxios = usePrivateAxios();
+  const toastify = useToastify();
 
   const styles = show ? { display: "block" } : { display: "none" };
 
@@ -41,6 +74,18 @@ export const Aside = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleLogout = () => {
+    privateAxios
+      .get("/auth/logout")
+      .then(() => {
+        toastify.success("Logging out successfully!");
+      })
+      .catch((error) => {
+        toastify.error("Opps, something wrong when logging out!");
+        console.log(error);
+      });
+  };
+
   return (
     <aside style={styles}>
       <div className="top">
@@ -56,28 +101,20 @@ export const Aside = () => {
       </div>
       <DashboardDate />
       <div className="sidebar">
-        <a href="#" className="active">
-          <GridViewSharpIcon />
-          <h3>Dashboard</h3>
-        </a>
-        <a href="#">
-          <Person4SharpIcon />
-          <h3>Users</h3>
-        </a>
-        <a href="#">
-          <NewspaperIcon />
-          <h3>News</h3>
-        </a>
-        <a href="#">
-          <ContactsIcon />
-          <h3>Contacts</h3>
-        </a>
-        <a href="#">
-          <SettingsIcon />
-          <h3>Settings</h3>
-        </a>
+        {navList.map((nav) => {
+          return (
+            <NavLink
+              key={nav.url}
+              to={nav.url}
+              className={(navData) => (navData.isActive ? "active" : "")}
+            >
+              {nav.icon}
+              <h3>{nav.name}</h3>
+            </NavLink>
+          );
+        })}
       </div>
-      <a href="#" className="logout-btn">
+      <a href="#" className="logout-btn" onClick={handleLogout}>
         <LogoutSharpIcon />
         <h3>Logout</h3>
       </a>

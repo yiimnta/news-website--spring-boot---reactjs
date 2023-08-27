@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 
-import com.news.news.dto.request.UserDTO;
+import com.news.news.dto.request.user.UserCreateDTO;
+import com.news.news.dto.request.user.UserUpdateDTO;
 import com.news.news.model.Role;
 import com.news.news.model.User;
+import com.news.news.model.UserStatusEnum;
 import com.news.news.repository.UserRepository;
 import com.news.news.service.CRUDService;
 import com.news.news.service.IUserService;
@@ -35,7 +37,7 @@ public class UserService implements IUserService, CRUDService<User> {
     @Value("${user.default.avatar.link}")
     private String defaultAvatarLink;
 
-    public User saveUserRequest(UserDTO userRequest, Set<Role> roles) {
+    public User saveUserRequest(UserCreateDTO userRequest, Set<Role> roles) {
 
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
 
@@ -52,13 +54,20 @@ public class UserService implements IUserService, CRUDService<User> {
         return save(newUser);
     }
 
-    public User updateUser(Long id, UserDTO userRequest) {
+    public User updateUser(Long id, UserUpdateDTO userRequest) {
 
         User user = userRepository.findById(id).orElse(null);
 
         if (user != null) {
+            if (StringUtils.isNotBlank(userRequest.getPassword())) {
+                String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
+                userRequest.setPassword(hashedPassword);
+            } else {
+                userRequest.setPassword(user.getPassword());
+            }
 
             BeanUtils.copyProperties(userRequest, user);
+            user.setStatus(UserStatusEnum.getStatusByNumber(userRequest.getStatus()));
             return userRepository.save(user);
         }
 

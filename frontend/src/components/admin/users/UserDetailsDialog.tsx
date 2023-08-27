@@ -165,6 +165,7 @@ export const UserDetailsDialog = forwardRef(
       let formValues = { ...formEmpty };
 
       if (user.id) {
+        // update mode
         Object.assign(formValues, user);
         setSelectedRoles(user.roles);
         setAvatar(user.avatar);
@@ -271,7 +272,11 @@ export const UserDetailsDialog = forwardRef(
               <label htmlFor="password">Password</label>
               <input
                 {...register("password", {
-                  required: "Password is required",
+                  validate: (value) => {
+                    if (user.id === undefined) {
+                      return value == null || "Password is required";
+                    }
+                  },
                   minLength: {
                     value: 6,
                     message: "Password must have at least 6 characters",
@@ -289,11 +294,20 @@ export const UserDetailsDialog = forwardRef(
               <label htmlFor="repassword">Confirm Password</label>
               <input
                 {...register("repassword", {
-                  required: "Confirm-Password is required",
                   validate: (value) => {
-                    return (
-                      watch("password") === value || "Passwords do not match"
-                    );
+                    if (
+                      user.id === undefined ||
+                      watch("password") != null ||
+                      watch("password") != ""
+                    ) {
+                      if (user.id === undefined) {
+                        return value == null || "Confirm-Password is required";
+                      }
+
+                      return (
+                        watch("password") === value || "Passwords do not match"
+                      );
+                    }
                   },
                 })}
                 required
@@ -400,7 +414,7 @@ export const UserDetailsDialog = forwardRef(
                         className="form-check-input"
                         style={{ marginRight: "8px" }}
                         value={value}
-                        defaultChecked={value === formEmpty.status}
+                        defaultChecked={value === watch("status")}
                       />
                       <label htmlFor={`status-${status}`}>{status}</label>
                     </div>

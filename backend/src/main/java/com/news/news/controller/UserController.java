@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.news.news.dto.request.DeleteIdsDTO;
-import com.news.news.dto.request.UserDTO;
+import com.news.news.dto.request.user.UserCreateDTO;
+import com.news.news.dto.request.user.UserUpdateDTO;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.dto.response.UserResponse;
 import com.news.news.model.Role;
@@ -37,7 +38,7 @@ public class UserController extends Controller {
     private RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<?> signup(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<?> signup(@RequestBody @Valid UserCreateDTO userDTO) {
         if (userService.existsByEmail(userDTO.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("Email have already existed"), HttpStatus.CONFLICT);
         } else {
@@ -83,7 +84,7 @@ public class UserController extends Controller {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO userDTO) {
 
         User updatedUser = userService.updateUser(id, userDTO);
 

@@ -1,4 +1,4 @@
-package com.news.news.dto.request;
+package com.news.news.dto.request.user;
 
 import java.util.List;
 
@@ -40,8 +40,6 @@ public class UserDTO {
     @GenderTypeSubSet(anyOf = { Gender.F, Gender.M, Gender.N })
     private Gender gender;
 
-    @NotEmpty
-    private String password;
     @NotEmpty
     private List<Long> roles;
 

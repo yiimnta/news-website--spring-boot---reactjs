@@ -184,6 +184,196 @@ export default function UserManager() {
 
   const { uploadIMG, deleteIMG } = useFirebase();
 
+  const axiosUserServices = {
+    create: (data: UserData, oldAvatar: string, imgURL: string) => {
+      data.avatar = imgURL;
+      delete data.avatarFile;
+
+      privateAxios
+        .post("/users", data)
+        .then((response) => {
+          oldAvatar &&
+            oldAvatar !== DEFAULT_USER_AVATAR &&
+            deleteIMG(oldAvatar as string)?.catch((error) => {
+              console.error("Cannot remove old avatar from storage: ", error);
+              toastify.error("Cannot remove old avatar from storage");
+            });
+
+          if (response.data) {
+            const newUsers = [...users, response.data];
+            setUsers(newUsers);
+            hideDialog();
+            userDetailFormRef.current?.resetForm();
+            toastify.success("Saving successfully!");
+          } else {
+            toastify.error("Cannot update datatable");
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Ops, something went wrong while adding new user",
+            error
+          );
+          toastify.error("Ops, something went wrong while adding new user");
+          deleteIMG(imgURL as string)?.catch((error) => {
+            console.error("Cannot remove new avatar from storage: ", error);
+            toastify.error("Cannot remove new avatar from storage");
+          });
+        });
+    },
+
+    createWithoutAvatar: (data: UserData) => {
+      delete data.avatarFile;
+      privateAxios
+        .post("/users", data)
+        .then((response) => {
+          if (response.data) {
+            const newUsers = [...users, response.data];
+            setUsers(newUsers);
+            hideDialog();
+            userDetailFormRef.current?.resetForm();
+            toastify.success("Saving successfully!");
+          } else {
+            toastify.error("Cannot update datatable");
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Ops, something went wrong while adding new user",
+            error
+          );
+          toastify.error("Ops, something went wrong while adding new user");
+        });
+    },
+
+    update: (data: UserData, oldAvatar: string, imgURL: string) => {
+      data.avatar = imgURL;
+      delete data.avatarFile;
+      privateAxios
+        .put(`/users/${user.id}`, data)
+        .then((response) => {
+          oldAvatar &&
+            oldAvatar !== DEFAULT_USER_AVATAR &&
+            deleteIMG(oldAvatar as string)?.catch((error) => {
+              console.error("Cannot remove old avatar from storage: ", error);
+              toastify.error("Cannot remove old avatar from storage");
+            });
+
+          if (response.data) {
+            const newUsers = [...users].map((u) => {
+              if (user.id === u.id) {
+                return response.data;
+              }
+
+              return u;
+            });
+
+            setUsers(newUsers);
+            hideDialog();
+            userDetailFormRef.current?.resetForm();
+            toastify.success("Updating successfully!");
+          } else {
+            toastify.error("Cannot update datatable");
+          }
+        })
+        .catch((error) => {
+          console.error(
+            `Ops, something went wrong while updating user ${user.id}`,
+            error
+          );
+          toastify.error(
+            `Ops, something went wrong while updating user ${user.id}`
+          );
+          deleteIMG(imgURL as string)?.catch((error) => {
+            console.error("Cannot remove new avatar from storage: ", error);
+            toastify.error("Cannot remove new avatar from storage");
+          });
+        });
+    },
+
+    updateWithoutAvatar: (data: UserData) => {
+      delete data.avatarFile;
+      privateAxios
+        .put(`/users/${user.id}`, data)
+        .then((response) => {
+          if (response.data) {
+            const newUsers = [...users].map((u) => {
+              if (user.id === u.id) {
+                return response.data;
+              }
+
+              return u;
+            });
+
+            setUsers(newUsers);
+            hideDialog();
+            userDetailFormRef.current?.resetForm();
+            toastify.success("Updating successfully!");
+          } else {
+            toastify.error("Cannot update datatable");
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Ops, something went wrong while adding new user",
+            error
+          );
+          toastify.error("Ops, something went wrong while adding new user");
+        });
+    },
+
+    delete: () => {
+      if (user.id && user.id !== auth.id) {
+        const data: DeleteIds = { ids: [user.id] };
+        privateAxios
+          .delete("/users", { data })
+          .then(() => {
+            toastify.success(`User ${user.id} has been deleted`);
+            const newUsers = [...users].filter((u) => u.id != user.id);
+            setUsers(newUsers);
+            setUser(emptyUser);
+          })
+          .catch((error) => {
+            console.log(error);
+            toastify.error(`Can not delete User ${user.id}`);
+          });
+      }
+
+      hideDeleteUserDialog();
+    },
+
+    deleteSelectedUsers: () => {
+      if (selectedUsers.length > 0) {
+        const data = {
+          ids: selectedUsers.map((u) => {
+            if (u.id && u.id !== auth.id) {
+              return u.id;
+            }
+          }),
+        };
+        if (data.ids.every((e) => e)) {
+          privateAxios
+            .delete("/users", { data })
+            .then(() => {
+              toastify.success(`Users have been deleted`);
+              const newUsers = [...users].filter(
+                (u) => !data.ids.includes(u.id)
+              );
+              setUsers(newUsers);
+            })
+            .catch((error) => {
+              console.log(error);
+              toastify.error(`Can not delete Users`);
+            });
+        } else {
+          toastify.error(`Can not delete selected users`);
+        }
+      }
+
+      hideDeleteUsersDialog();
+    },
+  };
+
   const saveUser = (data: UserData) => {
     if (data == null) {
       console.error("Data is null. Could not save data.");
@@ -195,69 +385,26 @@ export default function UserManager() {
 
       uploadIMG(data.avatarFile)
         ?.then((imgURL) => {
-          data.avatar = imgURL as string;
-          delete data.avatarFile;
-          privateAxios
-            .post("/users", data)
-            .then((response) => {
-              oldAvatar &&
-                oldAvatar !== DEFAULT_USER_AVATAR &&
-                deleteIMG(oldAvatar as string)?.catch((error) => {
-                  console.error(
-                    "Cannot remove old avatar from storage: ",
-                    error
-                  );
-                  toastify.error("Cannot remove old avatar from storage");
-                });
-
-              if (response) {
-                const newUsers = [...users, response.data];
-                setUsers(newUsers);
-                hideDialog();
-                userDetailFormRef.current?.resetForm();
-                toastify.success("Saving successfully!");
-              } else {
-                throw new Error("Error from Server");
-              }
-            })
-            .catch((error) => {
-              console.error(
-                "Ops, something went wrong while adding new user",
-                error
-              );
-              toastify.error("Ops, something went wrong while adding new user");
-              deleteIMG(imgURL as string)?.catch((error) => {
-                console.error("Cannot remove new avatar from storage: ", error);
-                toastify.error("Cannot remove new avatar from storage");
-              });
-            });
+          if (!data.id) {
+            // create new mode
+            axiosUserServices.create(data, oldAvatar, imgURL as string);
+          } else {
+            // update mode
+            axiosUserServices.update(data, oldAvatar, imgURL as string);
+          }
         })
         .catch((error) => {
           console.error("Cannot remove new avatar from storage: ", error);
           toastify.error("Cannot remove new avatar from storage");
         });
     } else {
-      delete data.avatarFile;
-      privateAxios
-        .post("/users", data)
-        .then((response) => {
-          if (response) {
-            const newUsers = [...users, response.data];
-            setUsers(newUsers);
-            hideDialog();
-            userDetailFormRef.current?.resetForm();
-            toastify.success("Saving successfully!");
-          } else {
-            throw new Error("Error from Server");
-          }
-        })
-        .catch((error) => {
-          console.error(
-            "Ops, something went wrong while adding new user",
-            error
-          );
-          toastify.error("Ops, something went wrong while adding new user");
-        });
+      if (!data.id) {
+        // create new mode
+        axiosUserServices.createWithoutAvatar(data);
+      } else {
+        // update mode
+        axiosUserServices.updateWithoutAvatar(data);
+      }
     }
   };
 
@@ -289,57 +436,8 @@ export default function UserManager() {
     setDeleteUserDialog(true);
   };
 
-  const deleteUser = () => {
-    if (user.id && user.id !== auth.id) {
-      const data: DeleteIds = { ids: [user.id] };
-      privateAxios
-        .delete("/users", { data })
-        .then(() => {
-          toastify.success(`User ${user.id} has been deleted`);
-          const newUsers = [...users].filter((u) => u.id != user.id);
-          setUsers(newUsers);
-          setUser(emptyUser);
-        })
-        .catch((error) => {
-          console.log(error);
-          toastify.error(`Can not delete User ${user.id}`);
-        });
-    }
-
-    hideDeleteUserDialog();
-  };
-
   const confirmDeleteSelected = () => {
     setDeleteUsersDialog(true);
-  };
-
-  const deleteSelectedUsers = () => {
-    if (selectedUsers.length > 0) {
-      const data = {
-        ids: selectedUsers.map((u) => {
-          if (u.id && u.id !== auth.id) {
-            return u.id;
-          }
-        }),
-      };
-      if (data.ids.every((e) => e)) {
-        privateAxios
-          .delete("/users", { data })
-          .then(() => {
-            toastify.success(`Users have been deleted`);
-            const newUsers = [...users].filter((u) => !data.ids.includes(u.id));
-            setUsers(newUsers);
-          })
-          .catch((error) => {
-            console.log(error);
-            toastify.error(`Can not delete Users`);
-          });
-      } else {
-        toastify.error(`Can not delete selected users`);
-      }
-    }
-
-    hideDeleteUsersDialog();
   };
 
   const hideDialog = () => {
@@ -544,7 +642,7 @@ export default function UserManager() {
         label="Yes"
         icon="pi pi-check"
         className="p-button-text"
-        onClick={deleteUser}
+        onClick={axiosUserServices.delete}
       />
     </>
   );
@@ -561,14 +659,31 @@ export default function UserManager() {
         label="Yes"
         icon="pi pi-check"
         className="p-button-text"
-        onClick={deleteSelectedUsers}
+        onClick={axiosUserServices.deleteSelectedUsers}
       />
     </>
   );
 
   const editUser = (data: User) => {
-    setUser({ ...data });
-    setUserDialog(true);
+    if (data.id) {
+      privateAxios
+        .get(`/users/${data.id}`)
+        .then((res) => {
+          if (res.data) {
+            setUser(res.data);
+            setUserDialog(true);
+          } else {
+            toastify.warn(`Can not get data of User ${data.id} from Server`);
+          }
+        })
+        .catch((error) => {
+          console.log(
+            "Something wrongs when getting data from server: ",
+            error
+          );
+          toastify.warn(`Can not get data of User ${data.id} from Server`);
+        });
+    }
   };
 
   return (

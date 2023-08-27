@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.news.news.dto.request.LoginDTO;
-import com.news.news.dto.request.AuthDTO;
+import com.news.news.dto.request.auth.AuthDTO;
+import com.news.news.dto.request.auth.LoginDTO;
 import com.news.news.dto.response.JwtAuthenticationResponse;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.exception.RefreshTokenException;
@@ -32,7 +32,10 @@ import com.news.news.service.impl.RefreshTokenService;
 import com.news.news.service.impl.RoleService;
 import com.news.news.service.impl.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -73,6 +76,11 @@ public class AuthController extends Controller {
             Set<Role> roles = new HashSet<>();
             roles.add(memberRole);
             User newUser = authService.register(authDTO, roles);
+
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(newUser.getEmail(), newUser.getPassword()));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             String jwt = jwtService.generateToken(newUser);
             JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(newUser);
@@ -131,5 +139,22 @@ public class AuthController extends Controller {
                 Boolean.parseBoolean(cookieRememberMe));
 
         return ResponseEntity.ok(jwtResponse);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws Exception {
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        refreshTokenService.removeRTCookie(response);
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok().build();
     }
 }

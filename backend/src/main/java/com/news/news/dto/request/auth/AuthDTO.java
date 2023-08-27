@@ -1,4 +1,4 @@
-package com.news.news.dto.request;
+package com.news.news.dto.request.auth;
 
 import com.news.news.annotation.GenderTypeSubSet;
 import com.news.news.model.Gender;
