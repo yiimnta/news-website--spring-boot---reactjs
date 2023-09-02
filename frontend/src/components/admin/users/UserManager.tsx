@@ -28,6 +28,7 @@ import TransgenderIcon from "@mui/icons-material/Transgender";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useAuth from "../../../hooks/useAuth";
+import useDashboardContext from "../../../hooks/useDashboardContext";
 
 export type UserData = {
   id?: number | undefined;
@@ -69,17 +70,17 @@ export default function UserManager() {
 
   const { auth } = useAuth();
   const toastify = useToastify();
-  const [submitted, setSubmitted] = useState(false);
+  const [, setSubmitted] = useState(false);
   const [userDialog, setUserDialog] = useState(false);
   const [user, setUser] = useState<User>(emptyUser);
-  const privateAxios = usePrivateAxios();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [deleteUserDialog, setDeleteUserDialog] = useState(false);
   const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [loading, setLoading] = useState(true);
+  const privateAxios = usePrivateAxios();
+  const { loading, setLoading, admin_id } = useDashboardContext();
   const userDetailFormRef = useRef<userDetailFormRef>();
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -171,6 +172,7 @@ export default function UserManager() {
       }
     };
 
+    setLoading(true);
     getUsers();
     getRoles();
     setLoading(false);
@@ -186,6 +188,7 @@ export default function UserManager() {
 
   const axiosUserServices = {
     create: (data: UserData, oldAvatar: string, imgURL: string) => {
+      setLoading(true);
       data.avatar = imgURL;
       delete data.avatarFile;
 
@@ -219,10 +222,14 @@ export default function UserManager() {
             console.error("Cannot remove new avatar from storage: ", error);
             toastify.error("Cannot remove new avatar from storage");
           });
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
 
     createWithoutAvatar: (data: UserData) => {
+      setLoading(true);
       delete data.avatarFile;
       privateAxios
         .post("/users", data)
@@ -243,10 +250,14 @@ export default function UserManager() {
             error
           );
           toastify.error("Ops, something went wrong while adding new user");
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
 
     update: (data: UserData, oldAvatar: string, imgURL: string) => {
+      setLoading(true);
       data.avatar = imgURL;
       delete data.avatarFile;
       privateAxios
@@ -288,10 +299,14 @@ export default function UserManager() {
             console.error("Cannot remove new avatar from storage: ", error);
             toastify.error("Cannot remove new avatar from storage");
           });
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
 
     updateWithoutAvatar: (data: UserData) => {
+      setLoading(true);
       delete data.avatarFile;
       privateAxios
         .put(`/users/${user.id}`, data)
@@ -319,11 +334,15 @@ export default function UserManager() {
             error
           );
           toastify.error("Ops, something went wrong while adding new user");
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
 
     delete: () => {
       if (user.id && user.id !== auth.id) {
+        setLoading(true);
         const data: DeleteIds = { ids: [user.id] };
         privateAxios
           .delete("/users", { data })
@@ -336,6 +355,9 @@ export default function UserManager() {
           .catch((error) => {
             console.log(error);
             toastify.error(`Can not delete User ${user.id}`);
+          })
+          .finally(() => {
+            setLoading(false);
           });
       }
 
@@ -352,6 +374,7 @@ export default function UserManager() {
           }),
         };
         if (data.ids.every((e) => e)) {
+          setLoading(true);
           privateAxios
             .delete("/users", { data })
             .then(() => {
@@ -364,6 +387,9 @@ export default function UserManager() {
             .catch((error) => {
               console.log(error);
               toastify.error(`Can not delete Users`);
+            })
+            .finally(() => {
+              setLoading(false);
             });
         } else {
           toastify.error(`Can not delete selected users`);
@@ -408,7 +434,7 @@ export default function UserManager() {
     }
   };
 
-  const onGlobalFilterChange = (e) => {
+  const onGlobalFilterChange = (e: any) => {
     const value = e.target.value;
     const _filters = { ...filters };
     _filters["global"].value = value;
@@ -486,13 +512,7 @@ export default function UserManager() {
       return (
         <div className="user-info-name">
           <div className="profile-photo">
-            <img
-              src={rowData.avatar}
-              onError={(e) =>
-                (e.target.src =
-                  "https://firebasestorage.googleapis.com/v0/b/news-ae8fb.appspot.com/o/default-avatar.jpg?alt=media&token=272fa245-a638-4896-8d74-a6d2b44256cb")
-              }
-            />
+            <img src={rowData.avatar} />
           </div>
           <div>
             <p>
@@ -589,7 +609,7 @@ export default function UserManager() {
   };
 
   const filterTemplate = {
-    status: (options) => {
+    status: (options: any) => {
       const statusList = statuses();
       return (
         <MultiSelect
@@ -602,7 +622,7 @@ export default function UserManager() {
         />
       );
     },
-    role: (options) => {
+    role: (options: any) => {
       return (
         <Dropdown
           value={options.value}
@@ -615,7 +635,7 @@ export default function UserManager() {
         />
       );
     },
-    gender: (options) => {
+    gender: (options: any) => {
       const genders = genderList();
       return (
         <MultiSelect
@@ -701,12 +721,17 @@ export default function UserManager() {
           dataKey="id"
           rowHover
           selection={selectedUsers}
-          onSelectionChange={(e) => setSelectedUsers(e.value)}
+          onSelectionChange={(e: { value: User[] }) => {
+            setSelectedUsers(e.value);
+          }}
           showSelectionElement={(e) => {
-            if (e.id === auth.id) {
-              return null;
+            if (e.id != admin_id && e.id !== auth.id) {
+              return true;
             }
-            return e;
+            return null;
+          }}
+          isDataSelectable={(e) => {
+            return e.data.id != admin_id && e.data.id !== auth.id;
           }}
           filters={filters}
           filterDisplay="menu"
@@ -714,7 +739,6 @@ export default function UserManager() {
           globalFilterFields={["id", "name", "email", "age"]}
           emptyMessage="No users found."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-          dragSelection
         >
           <Column
             selectionMode="multiple"

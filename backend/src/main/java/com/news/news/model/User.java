@@ -40,6 +40,7 @@ public class User implements UserDetails {
     private String firstname;
     private String lastname;
     private String email;
+    private String verifyToken;
     private UserStatusEnum status;
 
     @Lob
@@ -69,6 +70,12 @@ public class User implements UserDetails {
     public User(String firstname, String lastname, String email, String avatar, int age, Gender gender,
             String password, UserStatusEnum status) {
         this(firstname, lastname, email, avatar, age, gender, password, status.getValue());
+    }
+
+    public User(Long id, String firstname, String lastname, String email, String avatar, int age, Gender gender,
+            String password, UserStatusEnum status) {
+        this(firstname, lastname, email, avatar, age, gender, password, status.getValue());
+        this.id = id;
     }
 
     @Override

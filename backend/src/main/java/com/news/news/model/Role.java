@@ -16,9 +16,7 @@ public class Role {
     @Id
     @GeneratedValue
     private long id;
-
     private String name;
-
     private String color;
 
     public Role(String name) {
@@ -29,6 +27,12 @@ public class Role {
     public Role(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public Role(long id, String name, String color) {
+        this.name = name;
+        this.color = color;
+        this.id = id;
     }
 
 }

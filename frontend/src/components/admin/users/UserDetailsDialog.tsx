@@ -25,6 +25,11 @@ import { Role, User } from "../../../Define";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
+import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
+import { usePrivateAxios } from "../../../hooks/usePrivateAxios";
+import { useToastify } from "../../../hooks/useToastify";
+import useDashboardContext from "../../../hooks/useDashboardContext";
+import emailjs from "@emailjs/browser";
 
 type FormValue = {
   id: number | undefined;
@@ -68,13 +73,18 @@ export const UserDetailsDialog = forwardRef(
     const [avatarFile, setAvatarFile] = useState<HTMLInputElement | null>(null);
     const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
     const [rolesErrorMessage, setRolesErrorMessage] = useState<string>("");
+    const [showVerifyEmailBtn, setShowVerifyEmailBtn] =
+      useState<boolean>(false);
     const avatarRef = useRef(null);
     const { register, handleSubmit, formState, reset, watch } =
       useForm<FormValue>({
         defaultValues: formEmpty,
       });
-
     const { errors } = formState;
+    const privateAxios = usePrivateAxios();
+    const toastify = useToastify();
+    const { setLoading } = useDashboardContext();
+
     useImperativeHandle(ref, () => {
       return {
         resetForm: () => clearAllFields(),
@@ -86,6 +96,15 @@ export const UserDetailsDialog = forwardRef(
         setRolesErrorMessage("");
       }
     }, [selectedRoles]);
+
+    useEffect(() => {
+      setShowVerifyEmailBtn(
+        watch("email") != null &&
+          watch("email") != "" &&
+          errors.email == undefined &&
+          watch("status") == USER_STATUS.INACTIVE
+      );
+    }, [watch("status"), watch("email"), errors.email]);
 
     const onSubmitForm = async (data: FormValue, e) => {
       if (selectedRoles.length == 0) {
@@ -122,6 +141,44 @@ export const UserDetailsDialog = forwardRef(
       hideDialog();
     };
 
+    useEffect(
+      () => emailjs.init(`${import.meta.env.VITE_EMAILJS_PUBLIC_KEY}`),
+      []
+    );
+
+    const handleVerifyEmailClick = (e) => {
+      e.preventDefault();
+      const email = watch("email");
+
+      setLoading(true);
+      privateAxios.post("/users/verify", { email }).then((res) => {
+        if (res.data) {
+          const verification_link = `${window.location.origin}/verify?token=${res.data.message}&email=${email}`;
+          const serviceId = `${import.meta.env.VITE_EMAILJS_SERVICE_ID}`;
+          const templateId = `${import.meta.env.VITE_EMAILJS_TEMPLATE_ID}`;
+          const website = `${import.meta.env.VITE_EMAILJS_DATA_WEBSITE}`;
+          const data = {
+            to_name: watch("firstname") + " " + watch("lastname"),
+            website,
+            verification_link,
+            reply_to: email,
+          };
+          emailjs
+            .send(serviceId, templateId, data)
+            .then(() => {
+              toastify.success(`Sent a verify email message to ${email}`);
+            })
+            .catch((error) => {
+              toastify.error(`Cannot send a verify email message to ${email}`);
+              console.log(error);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        }
+      });
+    };
+
     const clearAllFields = () => {
       setSelectedRoles([]);
       setRolesErrorMessage("");
@@ -132,6 +189,15 @@ export const UserDetailsDialog = forwardRef(
 
     const userDialogFooter = (
       <>
+        {showVerifyEmailBtn && (
+          <Button
+            icon="pi"
+            className="p-button-text"
+            onClick={handleVerifyEmailClick}
+          >
+            <ForwardToInboxIcon /> <b>Verify Email</b>
+          </Button>
+        )}
         <Button icon="pi" className="p-button-text" onClick={handleCancelClick}>
           <CloseIcon /> <b>Cancel</b>
         </Button>
@@ -273,8 +339,8 @@ export const UserDetailsDialog = forwardRef(
               <input
                 {...register("password", {
                   validate: (value) => {
-                    if (user.id === undefined) {
-                      return value == null || "Password is required";
+                    if (user.id === undefined && value === null) {
+                      return "Password is required";
                     }
                   },
                   minLength: {
@@ -300,8 +366,8 @@ export const UserDetailsDialog = forwardRef(
                       watch("password") != null ||
                       watch("password") != ""
                     ) {
-                      if (user.id === undefined) {
-                        return value == null || "Confirm-Password is required";
+                      if (user.id === undefined && value === null) {
+                        return "Confirm-Password is required";
                       }
 
                       return (

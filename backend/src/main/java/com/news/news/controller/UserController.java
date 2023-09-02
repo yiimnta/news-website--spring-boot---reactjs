@@ -3,6 +3,8 @@ package com.news.news.controller;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +18,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.news.news.dto.request.DeleteIdsDTO;
+import com.news.news.dto.request.user.EmailVerificationDTO;
 import com.news.news.dto.request.user.UserCreateDTO;
 import com.news.news.dto.request.user.UserUpdateDTO;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.dto.response.UserResponse;
 import com.news.news.model.Role;
 import com.news.news.model.User;
+import com.news.news.model.UserStatusEnum;
 import com.news.news.service.impl.RoleService;
 import com.news.news.service.impl.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -93,6 +98,28 @@ public class UserController extends Controller {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<ResponseMessage> sendEmailVerification(
+            @RequestBody @Valid EmailVerificationDTO emailVerificationDTO, HttpServletRequest request) {
+
+        User verifyUser = userService.findByEmail(emailVerificationDTO.getEmail()).orElse(null);
+        if (verifyUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (verifyUser.getStatus() == UserStatusEnum.ACTIVE) {
+            ResponseMessage res = new ResponseMessage("User has been active!");
+            return ResponseEntity.ok(res);
+        }
+
+        String token = UUID.randomUUID().toString();
+        verifyUser.setVerifyToken(token);
+        userService.save(verifyUser);
+
+        ResponseMessage res = new ResponseMessage(token);
+        return ResponseEntity.ok(res);
     }
 
 }

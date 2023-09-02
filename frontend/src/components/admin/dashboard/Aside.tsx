@@ -11,7 +11,7 @@ import { DashboardContext } from "../../../contexts/DashboardProvider";
 import { DashboardDate } from "./DashboardDate";
 import { usePrivateAxios } from "../../../hooks/usePrivateAxios";
 import { useToastify } from "../../../hooks/useToastify";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 type NavObject = {
   url: string;
@@ -46,6 +46,7 @@ export const Aside = () => {
   const [showXButton, setShowXButton] = useState(false);
   const privateAxios = usePrivateAxios();
   const toastify = useToastify();
+  const navigate = useNavigate();
 
   const styles = show ? { display: "block" } : { display: "none" };
 
@@ -79,6 +80,7 @@ export const Aside = () => {
       .get("/auth/logout")
       .then(() => {
         toastify.success("Logging out successfully!");
+        navigate("/login");
       })
       .catch((error) => {
         toastify.error("Opps, something wrong when logging out!");

@@ -2,6 +2,7 @@ package com.news.news.controller;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.news.news.dto.request.auth.AuthDTO;
+import com.news.news.dto.request.auth.AuthEmailVerificationDTO;
 import com.news.news.dto.request.auth.LoginDTO;
+import com.news.news.dto.request.user.EmailVerificationDTO;
 import com.news.news.dto.response.JwtAuthenticationResponse;
 import com.news.news.dto.response.ResponseMessage;
 import com.news.news.exception.RefreshTokenException;
@@ -26,6 +30,7 @@ import com.news.news.model.RefreshToken;
 import com.news.news.model.Role;
 import com.news.news.model.RoleEnum;
 import com.news.news.model.User;
+import com.news.news.model.UserStatusEnum;
 import com.news.news.service.impl.AuthService;
 import com.news.news.service.impl.JWTService;
 import com.news.news.service.impl.RefreshTokenService;
@@ -156,5 +161,36 @@ public class AuthController extends Controller {
         SecurityContextHolder.clearContext();
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<ResponseMessage> sendEmailVerification(
+            @RequestBody @Valid AuthEmailVerificationDTO authEmailVerificationDTO,
+            HttpServletRequest request) {
+
+        User verifyUser = userService.findByEmail(authEmailVerificationDTO.getEmail()).orElse(null);
+        ResponseMessage res = new ResponseMessage("");
+        if (verifyUser == null) {
+            res.setMessage("Email not found");
+            return ResponseEntity.ok(res);
+        }
+
+        if (verifyUser.getStatus() == UserStatusEnum.ACTIVE) {
+            res.setMessage("User has been active!");
+            return ResponseEntity.ok(res);
+        }
+
+        if (verifyUser.getVerifyToken() == null) {
+            res.setMessage("Email not found");
+            return ResponseEntity.ok(res);
+        }
+
+        if (verifyUser.getVerifyToken().equals(authEmailVerificationDTO.getToken())) {
+            verifyUser.setStatus(UserStatusEnum.ACTIVE);
+            userService.save(verifyUser);
+            res.setMessage("User has been active!");
+        }
+
+        return ResponseEntity.ok(res);
     }
 }

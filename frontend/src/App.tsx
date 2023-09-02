@@ -18,20 +18,30 @@ import { ROLES } from "./Constants";
 import { ToastContainer } from "react-toastify";
 import { Greeting } from "./components/admin/greeting/Greeting";
 import { Settings } from "./components/admin/settings/Settings";
+import { EmailVerification } from "./components/EmailVerification";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/verify" element={<EmailVerification />} />
         <Route path="*" element={<NotFound />} />
         <Route element={<PersistLogin />}>
           <Route path="/" element={<HomePage />} />
-          <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]} />}>
+          <Route
+            element={
+              <RequireAuth allowedRoles={[ROLES.ROLE_ADMIN, ROLES.ROLE_MOD]} />
+            }
+          >
             <Route element={<DashboardPage />}>
               <Route path="/admin/" element={<Greeting />} />
               <Route path="/admin/news" element={<NewsManager />} />
-              <Route path="/admin/users" element={<UserManager />} />
+              <Route
+                element={<RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]} />}
+              >
+                <Route path="/admin/users" element={<UserManager />} />
+              </Route>
               <Route path="/admin/settings" element={<Settings />} />
             </Route>
           </Route>
